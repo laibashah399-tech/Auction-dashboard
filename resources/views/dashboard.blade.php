@@ -65,7 +65,7 @@
 
             <!-- Dashboard -->
 
-            <a href="#"
+            <a href="{{ route('dashboard') }}"
                 class="flex items-center gap-3 px-3 py-3 rounded-lg bg-indigo-600 text-white">
 
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
@@ -318,9 +318,16 @@
                         class="w-5 h-5 text-gray-400 mr-2">
                     </i>
 
-                    <input type="text"
-                        placeholder="Search auctions, lots, bidders..."
-                        class="bg-transparent outline-none w-full text-sm">
+                 <form action="{{ route('dashboard') }}" method="GET">
+
+<input
+type="text"
+name="search"
+value="{{ request('search') }}"
+placeholder="Search auctions..."
+class="bg-transparent outline-none w-full text-sm">
+
+</form>
 
                 </div>
 
@@ -411,27 +418,21 @@
 
 
                 <div class="flex gap-3">
+<button
+class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50">
 
-                    <button class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50">
+    <i data-lucide="download" class="w-4 h-4"></i>
 
-                        <i data-lucide="download"
-                            class="w-4 h-4">
-                        </i>
+    Export
 
-                        Export
-
-                    </button>
+</button>
 
 
-                    <button class="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
-
-                        <i data-lucide="plus"
-                            class="w-4 h-4">
-                        </i>
-
-                        Create Auction
-
-                    </button>
+                    <a href="{{ route('auctions.create') }}"
+   class="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    Create Auction
+</a>
 
                 </div>
 
@@ -458,8 +459,8 @@
                             </p>
 
                             <h3 class="text-3xl font-bold mt-2">
-                                124
-                            </h3>
+                               {{ $totalAuctions }}
+                          </h3>
 
                             <p class="text-sm text-green-600 mt-2 flex items-center gap-1">
 
@@ -500,7 +501,7 @@
                             </p>
 
                             <h3 class="text-3xl font-bold mt-2">
-                                12,540
+                                {{ $totalLots }}
                             </h3>
 
                             <p class="text-sm text-green-600 mt-2">
@@ -536,7 +537,7 @@
                             </p>
 
                             <h3 class="text-3xl font-bold mt-2">
-                                45,320
+                                {{ $totalBids }}
                             </h3>
 
                             <p class="text-sm text-green-600 mt-2">
@@ -572,7 +573,7 @@
                             </p>
 
                             <h3 class="text-3xl font-bold mt-2">
-                                £1.2M
+                                £{{ number_format($totalSales, 2) }}
                             </h3>
 
                             <p class="text-sm text-green-600 mt-2">
@@ -623,7 +624,7 @@
                             </p>
 
                             <h3 class="text-2xl font-bold">
-                                2,450
+                                {{ $registeredBidders }}
                             </h3>
 
                         </div>
@@ -652,7 +653,7 @@
                             </p>
 
                             <h3 class="text-2xl font-bold">
-                                8,420
+                                {{ $soldLots }}
                             </h3>
 
                         </div>
@@ -681,7 +682,7 @@
                             </p>
 
                             <h3 class="text-2xl font-bold">
-                                18
+                                {{ $pendingPayments }}
                             </h3>
 
                         </div>
@@ -710,7 +711,7 @@
                             </p>
 
                             <h3 class="text-2xl font-bold">
-                                126
+                                {{ $missingImages }}
                             </h3>
 
                         </div>
@@ -802,7 +803,7 @@
                                 </span>
 
                                 <span class="font-bold">
-                                    12
+                                    {{ $auctionStatus['live'] }}
                                 </span>
 
                             </div>
@@ -834,7 +835,7 @@
                                 </span>
 
                                 <span class="font-bold">
-                                    20
+                                    {{ $auctionStatus['upcoming'] }}
                                 </span>
 
                             </div>
@@ -866,7 +867,7 @@
                                 </span>
 
                                 <span class="font-bold">
-                                    92
+                                    {{ $auctionStatus['completed'] }}
                                 </span>
 
                             </div>
@@ -898,7 +899,7 @@
                                 </span>
 
                                 <span class="font-bold">
-                                    8
+                                    {{ $auctionStatus['draft'] }}
                                 </span>
 
                             </div>
@@ -942,10 +943,10 @@
                     </div>
 
 
-                    <button class="text-indigo-600 text-sm font-medium hover:text-indigo-800">
-                        View All Auctions →
-                    </button>
-
+                    <a href="{{ route('auctions.index') }}"
+   class="text-indigo-600 text-sm font-medium hover:text-indigo-800">
+    View All Auctions →
+</a>
                 </div>
 
 
@@ -986,214 +987,109 @@
                         </thead>
 
 
-                        <tbody class="divide-y divide-gray-100">
+                       <tbody class="divide-y divide-gray-100">
 
+    @forelse($liveAuctions as $auction)
 
-                            <tr class="hover:bg-gray-50">
+        <tr class="hover:bg-gray-50">
 
-                                <td class="px-6 py-4">
+            <td class="px-6 py-4">
 
-                                    <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3">
 
-                                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
 
-                                            <i data-lucide="image"
-                                                class="w-5 h-5 text-indigo-600">
-                                            </i>
+                        <i data-lucide="gavel"
+                           class="w-5 h-5 text-indigo-600">
+                        </i>
 
-                                        </div>
+                    </div>
 
-                                        <div>
+                    <div>
 
-                                            <p class="font-semibold">
-                                                Fine Art Collection
-                                            </p>
+                        <p class="font-semibold">
+                            {{ $auction->name }}
+                        </p>
 
-                                            <p class="text-xs text-gray-500">
-                                                Ends in 02h 34m
-                                            </p>
+                        <p class="text-xs text-gray-500">
 
-                                        </div>
+                            @if($auction->end_at)
+                                Ends {{ $auction->end_at->diffForHumans() }}
+                            @else
+                                No end date
+                            @endif
 
-                                    </div>
+                        </p>
 
-                                </td>
+                    </div>
 
-                                <td class="px-6 py-4">
-                                    520
-                                </td>
+                </div>
 
-                                <td class="px-6 py-4">
-                                    2,340
-                                </td>
+            </td>
 
-                                <td class="px-6 py-4 font-semibold">
-                                    £245,800
-                                </td>
+            <td class="px-6 py-4">
+                {{ $auction->lots_count }}
+            </td>
 
-                                <td class="px-6 py-4">
+            <td class="px-6 py-4">
 
-                                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
+                {{ $auction->lots->sum(function ($lot) {
+                    return $lot->bids->count();
+                }) }}
 
-                                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse">
-                                        </span>
+            </td>
 
-                                        Live
+            <td class="px-6 py-4 font-semibold">
 
-                                    </span>
+                £{{ number_format($auction->total_sales, 2) }}
 
-                                </td>
+            </td>
 
-                                <td class="px-6 py-4 text-right">
+            <td class="px-6 py-4">
 
-                                    <button class="p-2 hover:bg-gray-100 rounded-lg">
+                <span class="inline-flex items-center gap-2 px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
 
-                                        <i data-lucide="more-horizontal"
-                                            class="w-5 h-5">
-                                        </i>
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse">
+                    </span>
 
-                                    </button>
+                    Live
 
-                                </td>
+                </span>
 
-                            </tr>
+            </td>
 
+            <td class="px-6 py-4 text-right">
 
-                            <tr class="hover:bg-gray-50">
+                <a href="{{ route('auctions.show',$auction->id) }}">
+                <a href="{{ route('auctions.edit',$auction->id) }}">
+                   class="p-2 hover:bg-gray-100 rounded-lg inline-block">
 
-                                <td class="px-6 py-4">
+                    <i data-lucide="more-horizontal"
+                       class="w-5 h-5">
+                    </i>
 
-                                    <div class="flex items-center gap-3">
+                </a>
 
-                                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            </td>
 
-                                            <i data-lucide="gem"
-                                                class="w-5 h-5 text-purple-600">
-                                            </i>
+        </tr>
 
-                                        </div>
+    @empty
 
-                                        <div>
+        <tr>
 
-                                            <p class="font-semibold">
-                                                Jewellery Auction
-                                            </p>
+            <td colspan="6"
+                class="px-6 py-10 text-center text-gray-500">
 
-                                            <p class="text-xs text-gray-500">
-                                                Ends in 05h 12m
-                                            </p>
+                No live auctions found.
 
-                                        </div>
+            </td>
 
-                                    </div>
+        </tr>
 
-                                </td>
+    @endforelse
 
-                                <td class="px-6 py-4">
-                                    320
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    1,850
-                                </td>
-
-                                <td class="px-6 py-4 font-semibold">
-                                    £182,450
-                                </td>
-
-                                <td class="px-6 py-4">
-
-                                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
-
-                                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse">
-                                        </span>
-
-                                        Live
-
-                                    </span>
-
-                                </td>
-
-                                <td class="px-6 py-4 text-right">
-
-                                    <button class="p-2 hover:bg-gray-100 rounded-lg">
-
-                                        <i data-lucide="more-horizontal"
-                                            class="w-5 h-5">
-                                        </i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            <tr class="hover:bg-gray-50">
-
-                                <td class="px-6 py-4">
-
-                                    <div class="flex items-center gap-3">
-
-                                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-
-                                            <i data-lucide="clock"
-                                                class="w-5 h-5 text-orange-600">
-                                            </i>
-
-                                        </div>
-
-                                        <div>
-
-                                            <p class="font-semibold">
-                                                Antique Collection
-                                            </p>
-
-                                            <p class="text-xs text-gray-500">
-                                                Starts tomorrow
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    850
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    —
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    —
-                                </td>
-
-                                <td class="px-6 py-4">
-
-                                    <span class="px-3 py-1 bg-yellow-50 text-yellow-600 rounded-full text-xs font-medium">
-                                        Upcoming
-                                    </span>
-
-                                </td>
-
-                                <td class="px-6 py-4 text-right">
-
-                                    <button class="p-2 hover:bg-gray-100 rounded-lg">
-
-                                        <i data-lucide="more-horizontal"
-                                            class="w-5 h-5">
-                                        </i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                        </tbody>
+</tbody>
 
                     </table>
 
