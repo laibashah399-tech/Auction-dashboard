@@ -2,63 +2,85 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auction;
 use Illuminate\Http\Request;
 
 class AuctionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $auctions = Auction::withCount('lots')
+            ->latest()
+            ->paginate(10);
+
+        return view('auctions.index', compact('auctions'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('auctions.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:draft,upcoming,live,completed',
+            'start_at' => 'nullable|date',
+            'end_at' => 'nullable|date|after_or_equal:start_at',
+            'total_sales' => 'nullable|numeric|min:0',
+        ]);
+
+        Auction::create($validated);
+
+        return redirect()
+            ->route('auctions.index')
+            ->with('success', 'Auction created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Auction $auction)
     {
-        //
+        $auction->load([
+            'lots' => function ($query) {
+                $query->withCount('bids')
+                    ->with('bids')
+                    ->latest();
+            }
+        ]);
+
+        return view('auctions.show', compact('auction'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Auction $auction)
     {
-        //
+        return view('auctions.edit', compact('auction'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Auction $auction)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:draft,upcoming,live,completed',
+            'start_at' => 'nullable|date',
+            'end_at' => 'nullable|date|after_or_equal:start_at',
+            'total_sales' => 'nullable|numeric|min:0',
+        ]);
+
+        $auction->update($validated);
+
+        return redirect()
+            ->route('auctions.show', $auction)
+            ->with('success', 'Auction updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Auction $auction)
     {
-        //
+        $auction->delete();
+
+        return redirect()
+            ->route('auctions.index')
+            ->with('success', 'Auction deleted successfully.');
     }
 }

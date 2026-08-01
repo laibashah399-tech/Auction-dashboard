@@ -77,46 +77,59 @@
 
             <!-- Auctions -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+<a href="{{ route('auctions.index') }}"
+    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
 
-                <i data-lucide="gavel" class="w-5 h-5"></i>
+    <i data-lucide="gavel" class="w-5 h-5"></i>
 
-                <span>Auctions</span>
+    <span>Auctions</span>
 
-                <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
-                    124
-                </span>
+    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+        {{ $totalAuctions }}
+    </span>
 
-            </a>
+</a>
+
 
 
             <!-- Lots -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            
+<a href="{{ route('lots.index') }}"
+    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
 
-                <i data-lucide="package" class="w-5 h-5"></i>
+    <i data-lucide="package" class="w-5 h-5"></i>
 
-                <span>Lots</span>
+    <span>Lots</span>
 
-            </a>
+    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+        {{ $totalLots }}
+    </span>
+
+</a>
 
 
-            <!-- Imports -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
 
-                <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+            <!-- Bulk-Imports -->
 
-                <span>Bulk Imports</span>
+<a href="{{ route('bulk-imports.index') }}"
+   class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
 
-                <span class="ml-auto bg-orange-500 text-xs px-2 py-1 rounded-full">
-                    3
-                </span>
+    <i data-lucide="upload" class="w-5 h-5"></i>
 
-            </a>
+    <span>Bulk Imports</span>
+
+    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+        {{ \App\Models\BulkImport::count() }}
+    </span>
+
+</a>
+
+    
+
+
+
 
 
             <!-- Media -->

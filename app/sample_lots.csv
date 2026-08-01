@@ -1,0 +1,9 @@
+auction_id,lot_number,title,description,starting_price,current_bid,status,image
+1,LOT-1001,Antique Wooden Chair,Beautiful antique wooden chair,500,2500,sold,chair.jpg
+1,LOT-1002,Classic Oil Painting,Original classic oil painting,1000,3500,sold,painting.jpg
+1,LOT-1003,Vintage Clock,Beautiful vintage wall clock,300,0,available,clock.jpg
+2,LOT-2001,Diamond Necklace,Luxury diamond necklace,5000,0,available,necklace.jpg
+2,LOT-2002,Gold Watch,Premium vintage gold watch,2500,0,available,watch.jpg
+3,LOT-3001,Persian Carpet,Handmade Persian carpet,3000,5000,sold,carpet.jpg
+3,LOT-3002,Antique Vase,Beautiful antique ceramic vase,800,1200,sold,vase.jpg
+3,LOT-3003,Silver Sculpture,Decorative silver sculpture,1500,0,unsold,sculpture.jpg

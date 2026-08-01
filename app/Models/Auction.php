@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Auction extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'description',
@@ -22,7 +24,7 @@ class Auction extends Model
         'total_sales' => 'decimal:2',
     ];
 
-    public function lots(): HasMany
+    public function lots()
     {
         return $this->hasMany(Lot::class);
     }

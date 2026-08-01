@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Lot extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'auction_id',
         'lot_number',
@@ -24,12 +25,12 @@ class Lot extends Model
         'current_bid' => 'decimal:2',
     ];
 
-    public function auction(): BelongsTo
+    public function auction()
     {
         return $this->belongsTo(Auction::class);
     }
 
-    public function bids(): HasMany
+    public function bids()
     {
         return $this->hasMany(Bid::class);
     }
