@@ -3,29 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Bidder extends Model
 {
     protected $fillable = [
+        'bidder_number',
         'name',
         'email',
         'phone',
         'address',
-        'is_active',
+        'status',
+        'total_bids',
+        'total_spent',
     ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
-    public function bids(): HasMany
-    {
-        return $this->hasMany(Bid::class);
-    }
-
-    public function payments(): HasMany
-    {
-        return $this->hasMany(Payment::class);
-    }
 }

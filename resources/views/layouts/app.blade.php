@@ -107,33 +107,33 @@
 
 
             {{-- Bidders --}}
-            <a href="#"
-               class="flex items-center gap-3 px-3 py-3 rounded-lg
-               {{ request()->routeIs('bidders.*') ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}
-               transition">
+          <a href="{{ route('bidders.index') }}"
+   class="flex items-center gap-3 px-3 py-3 rounded-lg
+   {{ request()->routeIs('bidders.*') ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}
+   transition">
 
-                <i data-lucide="users" class="w-5 h-5"></i>
+    <i data-lucide="users" class="w-5 h-5"></i>
 
-                <span>
-                    Bidders
-                </span>
+    <span>
+        Bidders
+    </span>
 
-            </a>
+</a>
 
 
             {{-- Payments --}}
-            <a href="#"
-               class="flex items-center gap-3 px-3 py-3 rounded-lg
-               {{ request()->routeIs('payments.*') ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}
-               transition">
+           <a href="{{ route('payments.index') }}"
+   class="flex items-center gap-3 px-3 py-3 rounded-lg
+   {{ request()->routeIs('payments.*') ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}
+   transition">
 
-                <i data-lucide="credit-card" class="w-5 h-5"></i>
+    <i data-lucide="credit-card" class="w-5 h-5"></i>
 
-                <span>
-                    Payments
-                </span>
+    <span>
+        Payments
+    </span>
 
-            </a>
+</a>
 
 
             <div class="pt-6">

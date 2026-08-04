@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\LotController;
 use App\Http\Controllers\BulkImportController;
+use App\Http\Controllers\BidderController;
+use App\Http\Controllers\PaymentController;
 
 
 Route::get('/', function () {
@@ -41,6 +43,17 @@ Route::post('/bulk-imports', [
 Route::delete('/bulk-imports/{import}', [
     BulkImportController::class,
     'destroy'
-])->name('bulk-imports.destroy');
+])->name('bulk-imports.destroy');  
+
+
+Route::resource('bidders', BidderController::class)
+    ->except(['show']);
+
+    Route::resource(
+    'payments',
+    PaymentController::class
+)->except([
+    'show'
+]);
 
 

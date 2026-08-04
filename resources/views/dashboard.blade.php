@@ -200,16 +200,16 @@
 
             <!-- Payments -->
 
-            <a href="#"
+            <a href="{{ route('payments.index') }}"
                 class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
 
                 <i data-lucide="credit-card" class="w-5 h-5"></i>
 
                 <span>Payments</span>
 
-                <span class="ml-auto text-xs bg-red-500 px-2 py-1 rounded-full">
-                    18
-                </span>
+               <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+        {{ \App\Models\Payment::count() }}
+    </span>
 
             </a>
 

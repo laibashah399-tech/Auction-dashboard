@@ -1,54 +1,62 @@
 @extends('layouts.app')
 
+@section('title', 'Import Lots')
+
+@section('page-heading')
+Import Lots
+@endsection
+
+@section('page-description')
+Upload a CSV file to add multiple lots to an auction.
+@endsection
+
 @section('content')
 
-<div class="p-6 lg:p-8">
+<div>
 
-{{-- Header --}}
-<div class="mb-8">
+```
+{{-- Breadcrumb --}}
+<div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
 
-    <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+    <a href="{{ route('dashboard') }}" class="hover:text-indigo-600">
+        Dashboard
+    </a>
 
-        <a href="{{ route('dashboard') }}" class="hover:text-indigo-600">
-            Dashboard
-        </a>
+    <span>/</span>
 
-        <span>/</span>
+    <a href="{{ route('bulk-imports.index') }}" class="hover:text-indigo-600">
+        Bulk Imports
+    </a>
 
-        <a href="{{ route('bulk-imports.index') }}" class="hover:text-indigo-600">
-            Bulk Imports
-        </a>
+    <span>/</span>
 
-        <span>/</span>
+    <span>Import Lots</span>
 
-        <span>Create</span>
-
-    </div>
-
-
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-        <div>
-
-            <h1 class="text-3xl font-bold text-gray-800">
-                Import Lots
-            </h1>
-
-            <p class="text-gray-500 mt-1">
-                Upload a CSV file to add multiple lots to an auction.
-            </p>
-
-        </div>
+</div>
 
 
-        <a href="{{ route('bulk-imports.index') }}"
-           class="px-5 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition">
+{{-- Page Header --}}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
-            ← Back to Imports
+    <div>
 
-        </a>
+        <h1 class="text-3xl font-bold text-gray-800">
+            Import Lots
+        </h1>
+
+        <p class="text-gray-500 mt-1">
+            Upload a CSV file to add multiple lots to an auction.
+        </p>
 
     </div>
+
+
+    <a
+        href="{{ route('bulk-imports.index') }}"
+        class="px-5 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition"
+    >
+        ← Back to Imports
+    </a>
 
 </div>
 
@@ -106,9 +114,11 @@
             </div>
 
 
-            <form action="{{ route('bulk-imports.store') }}"
-                  method="POST"
-                  enctype="multipart/form-data">
+            <form
+                action="{{ route('bulk-imports.store') }}"
+                method="POST"
+                enctype="multipart/form-data"
+            >
 
                 @csrf
 
@@ -120,9 +130,11 @@
                         Select Auction
                     </label>
 
-                    <select name="auction_id"
-                            required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                    <select
+                        name="auction_id"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                    >
 
                         <option value="">
                             -- Select Auction --
@@ -130,11 +142,11 @@
 
                         @foreach($auctions as $auction)
 
-                            <option value="{{ $auction->id }}"
-                                {{ old('auction_id') == $auction->id ? 'selected' : '' }}>
-
+                            <option
+                                value="{{ $auction->id }}"
+                                {{ old('auction_id') == $auction->id ? 'selected' : '' }}
+                            >
                                 {{ $auction->name }}
-
                             </option>
 
                         @endforeach
@@ -173,16 +185,19 @@
                             Maximum file size: 5MB
                         </p>
 
-                        <input type="file"
-                               name="csv_file"
-                               accept=".csv,.txt"
-                               required
-                               class="hidden"
-                               onchange="showFileName(this)">
+                        <input
+                            type="file"
+                            name="csv_file"
+                            accept=".csv,.txt"
+                            required
+                            class="hidden"
+                            onchange="showFileName(this)"
+                        >
 
-                        <div id="file-name"
-                             class="mt-4 text-sm font-semibold text-indigo-600">
-                        </div>
+                        <div
+                            id="file-name"
+                            class="mt-4 text-sm font-semibold text-indigo-600"
+                        ></div>
 
                     </label>
 
@@ -192,19 +207,19 @@
                 {{-- Buttons --}}
                 <div class="flex flex-col sm:flex-row justify-end gap-3">
 
-                    <a href="{{ route('bulk-imports.index') }}"
-                       class="px-6 py-3 text-center bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition">
-
+                    <a
+                        href="{{ route('bulk-imports.index') }}"
+                        class="px-6 py-3 text-center bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition"
+                    >
                         Cancel
-
                     </a>
 
 
-                    <button type="submit"
-                            class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition">
-
+                    <button
+                        type="submit"
+                        class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition"
+                    >
                         Import Lots
-
                     </button>
 
                 </div>
@@ -224,7 +239,6 @@
             <h2 class="text-lg font-bold text-gray-800 mb-5">
                 CSV Format
             </h2>
-
 
             <p class="text-sm text-gray-500 mb-5">
                 Your CSV file must contain these columns:
@@ -317,7 +331,8 @@ function showFileName(input) {
 
     if (input.files && input.files.length > 0) {
 
-        fileName.textContent = 'Selected: ' + input.files[0].name;
+        fileName.textContent =
+            'Selected: ' + input.files[0].name;
 
     } else {
 
