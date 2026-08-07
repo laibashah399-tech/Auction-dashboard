@@ -14,7 +14,7 @@ Upload a CSV file to add multiple lots to an auction.
 
 <div>
 
-```
+
 {{-- Breadcrumb --}}
 <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
 
@@ -285,7 +285,7 @@ Upload a CSV file to add multiple lots to an auction.
 
                 <div class="p-3 bg-gray-50 rounded-lg">
                     <span class="font-mono text-sm text-indigo-600">
-                        image
+                        images
                     </span>
                 </div>
 
@@ -319,7 +319,7 @@ Upload a CSV file to add multiple lots to an auction.
     </div>
 
 </div>
-```
+
 
 </div>
 

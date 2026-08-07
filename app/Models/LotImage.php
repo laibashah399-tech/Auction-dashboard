@@ -3,22 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Bid extends Model
+class LotImage extends Model
 {
     protected $fillable = [
         'lot_id',
-        'bidder_id',
-        'amount'
+        'image',
     ];
 
-    public function lot()
+    public function lot(): BelongsTo
     {
         return $this->belongsTo(Lot::class);
-    }
-
-    public function bidder()
-    {
-        return $this->belongsTo(Bidder::class);
     }
 }

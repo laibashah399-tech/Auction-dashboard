@@ -371,19 +371,18 @@
 
 
                     {{-- LOTS --}}
-                    <td class="px-6 py-5">
+                   <td class="px-6 py-5">
 
+    <a href="{{ route('auctions.show', $auction) }}"
+       class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold transition">
 
-                        <div class="flex items-center gap-2 text-slate-700">
+        <i data-lucide="package" class="w-4 h-4"></i>
 
-                            <i data-lucide="package" class="w-4 h-4 text-slate-400"></i>
+        {{ $auction->lots_count }}
 
-                            {{ $auction->lots_count }}
+    </a>
 
-                        </div>
-
-
-                    </td>
+</td>
 
 
 

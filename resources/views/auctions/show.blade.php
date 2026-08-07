@@ -224,7 +224,20 @@
 
         </div>
 
-    </div>
+    </div>      
+
+    
+       <!--AUCTION IMAGES -->
+    <h3 class="text-lg font-semibold mt-6 mb-3">Auction Images</h3>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    @foreach($auction->images as $image)
+        <img
+            src="{{ asset('storage/'.$image->image) }}"
+            class="w-full h-40 object-cover rounded-lg border"
+        >
+    @endforeach
+</div>
 
 
     <!-- LOTS -->

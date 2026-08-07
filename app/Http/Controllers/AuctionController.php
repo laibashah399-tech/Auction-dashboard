@@ -31,14 +31,23 @@ class AuctionController extends Controller
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'total_sales' => 'nullable|numeric|min:0',
         ]);
+        $auction = Auction::create($validated);
 
-        Auction::create($validated);
+        // Upload Multiple Images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('auctions', 'public');
+
+                $auction->images()->create([
+                    'image' => $path,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('auctions.index')
             ->with('success', 'Auction created successfully.');
     }
-
     public function show(Auction $auction)
     {
         $auction->load([

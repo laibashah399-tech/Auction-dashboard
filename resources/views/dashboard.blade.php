@@ -145,9 +145,10 @@
 
 
             <!-- Live Bidding -->
-
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+   <a href="{{ route('live-bidding.index') }}"
+    class="flex items-center gap-3 px-3 py-3 rounded-lg
+    {{ request()->routeIs('live-bidding.*') ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}
+    transition">
 
                 <i data-lucide="radio" class="w-5 h-5"></i>
 
@@ -176,7 +177,7 @@
 
             <!-- Bidders -->
 
-            <a href="#"
+            <a href="{{ route('bidders.index') }}"
                 class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
 
                 <i data-lucide="users" class="w-5 h-5"></i>

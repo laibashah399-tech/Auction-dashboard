@@ -6,7 +6,11 @@ use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\LotController;
 use App\Http\Controllers\BulkImportController;
 use App\Http\Controllers\BidderController;
+use App\Http\Controllers\BidController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AuctionImageController;
+use App\Http\Controllers\LiveBiddingController;
+
 
 
 Route::get('/', function () {
@@ -20,7 +24,7 @@ Route::get('/dashboard', [
 
 Route::resource('auctions', AuctionController::class);
 
-Route::get('/lots', [ LotController::class, 'index' ])->name('lots.index'); Route::get('/lots/{lot}', [ LotController::class, 'show' ])->name('lots.show');
+Route::resource('lots', LotController::class);
 
 Route::get('/bulk-imports', [
     BulkImportController::class,
@@ -57,3 +61,13 @@ Route::resource('bidders', BidderController::class)
 ]);
 
 
+Route::delete('/auction-images/{image}', [AuctionImageController::class, 'destroy'])
+    ->name('auction-images.destroy');
+
+
+    Route::post('/lots/{lot}/bid',[BidController::class,'store'])
+    ->name('bids.store');
+
+
+  Route::get('/live-bidding', [LiveBiddingController::class, 'index'])
+    ->name('live-bidding.index');

@@ -1,436 +1,276 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
+@section('title', 'Lots')
 
-    <meta charset="UTF-8">
+@section('page-heading', 'Lots')
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('page-description', 'Manage all auction lots.')
 
-    <title>Lots - AuctionPro</title>
+@section('content')
 
-    <script src="https://cdn.tailwindcss.com"></script>
-
-</head>
+<div class="space-y-6">
 
 
-<body class="bg-slate-100">
+    {{-- Header --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
+        <div>
 
-<div class="min-h-screen">
+            <h1 class="text-2xl font-bold text-slate-800">
+                All Lots
+            </h1>
 
-
-    <!-- Top Header -->
-
-    <header class="bg-white border-b border-slate-200">
-
-        <div class="max-w-7xl mx-auto px-6 py-5">
-
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-
-                <div>
-
-                    <div class="flex items-center gap-3">
-
-                        <div class="w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center">
-
-                            <span class="text-white text-xl font-bold">
-                                AP
-                            </span>
-
-                        </div>
-
-                        <div>
-
-                            <h1 class="text-2xl font-bold text-slate-800">
-                                Lots
-                            </h1>
-
-                            <p class="text-sm text-slate-500">
-                                Manage and monitor all auction lots
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="flex gap-3">
-
-                    <a
-                        href="{{ route('dashboard') }}"
-                        class="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50"
-                    >
-                        ← Dashboard
-                    </a>
-
-
-                    <a
-                        href="{{ route('auctions.index') }}"
-                        class="px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700"
-                    >
-                        View Auctions
-                    </a>
-
-                </div>
-
-            </div>
+            <p class="text-slate-500 mt-1">
+                Manage your auction lots, prices and images.
+            </p>
 
         </div>
 
-    </header>
+
+        <a
+            href="{{ route('lots.create') }}"
+            class="inline-flex items-center justify-center px-5 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700"
+        >
+            + Create Lot
+        </a>
+
+    </div>
 
 
+    {{-- Success --}}
+    @if(session('success'))
 
-    <!-- Main Content -->
-
-    <main class="max-w-7xl mx-auto px-6 py-8">
-
-
-        <!-- Statistics -->
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-
-
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-
-                <p class="text-sm text-slate-500">
-                    Total Lots
-                </p>
-
-                <h2 class="text-3xl font-bold text-slate-800 mt-2">
-                    {{ $lots->total() }}
-                </h2>
-
-                <p class="text-xs text-slate-400 mt-2">
-                    All registered lots
-                </p>
-
-            </div>
-
-
-
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-
-                <p class="text-sm text-slate-500">
-                    Available
-                </p>
-
-                <h2 class="text-3xl font-bold text-emerald-600 mt-2">
-
-                    {{ \App\Models\Lot::where('status', 'available')->count() }}
-
-                </h2>
-
-                <p class="text-xs text-slate-400 mt-2">
-                    Ready for auction
-                </p>
-
-            </div>
-
-
-
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-
-                <p class="text-sm text-slate-500">
-                    Sold
-                </p>
-
-                <h2 class="text-3xl font-bold text-indigo-600 mt-2">
-
-                    {{ \App\Models\Lot::where('status', 'sold')->count() }}
-
-                </h2>
-
-                <p class="text-xs text-slate-400 mt-2">
-                    Successfully sold
-                </p>
-
-            </div>
-
-
-
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-
-                <p class="text-sm text-slate-500">
-                    Unsold
-                </p>
-
-                <h2 class="text-3xl font-bold text-red-500 mt-2">
-
-                    {{ \App\Models\Lot::where('status', 'unsold')->count() }}
-
-                </h2>
-
-                <p class="text-xs text-slate-400 mt-2">
-                    Did not sell
-                </p>
-
-            </div>
-
-
+        <div class="bg-green-50 border border-green-200 text-green-700 px-5 py-4 rounded-xl">
+            {{ session('success') }}
         </div>
 
+    @endif
 
 
-        <!-- Lots Table -->
+    {{-- Table --}}
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
 
+            <table class="w-full">
 
-            <div class="px-6 py-5 border-b border-slate-100">
+                <thead class="bg-slate-50 border-b">
 
-                <h2 class="text-lg font-bold text-slate-800">
-                    All Auction Lots
-                </h2>
+                    <tr>
 
-                <p class="text-sm text-slate-500 mt-1">
-                    View complete information about every lot
-                </p>
+                        <th class="px-6 py-4 text-left text-sm font-semibold">
+                            Image
+                        </th>
 
-            </div>
+                        <th class="px-6 py-4 text-left text-sm font-semibold">
+                            Lot
+                        </th>
 
+                        <th class="px-6 py-4 text-left text-sm font-semibold">
+                            Auction
+                        </th>
 
+                        <th class="px-6 py-4 text-left text-sm font-semibold">
+                            Starting Price
+                        </th>
 
-            <div class="overflow-x-auto">
+                        <th class="px-6 py-4 text-left text-sm font-semibold">
+                            Current Bid
+                        </th>
 
+                        <th class="px-6 py-4 text-left text-sm font-semibold">
+                            Bids
+                        </th>
 
-                <table class="w-full text-left">
+                        <th class="px-6 py-4 text-left text-sm font-semibold">
+                            Status
+                        </th>
 
+                        <th class="px-6 py-4 text-right text-sm font-semibold">
+                            Actions
+                        </th>
 
-                    <thead class="bg-slate-50 border-b border-slate-200">
+                    </tr>
 
-                        <tr>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Lot
-                            </th>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Item
-                            </th>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Auction
-                            </th>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Starting Price
-                            </th>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Current Bid
-                            </th>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Bids
-                            </th>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Status
-                            </th>
-
-                            <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
-                                Action
-                            </th>
-
-                        </tr>
-
-                    </thead>
+                </thead>
 
 
-
-                    <tbody class="divide-y divide-slate-100">
-
+                <tbody class="divide-y">
 
                     @forelse($lots as $lot)
 
+                        <tr class="hover:bg-slate-50">
 
-                        <tr class="hover:bg-slate-50 transition">
+
+                            {{-- Image --}}
+                         
+
+<td class="px-6 py-4">
+
+    @if($lot->image)
+
+        <div class="flex items-center gap-3">
+
+            
+
+            <!-- Image Path -->
+            <button
+                type="button"
+                onclick="showLotImage('{{ asset('storage/' . $lot->image) }}')"
+                class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline font-mono"
+            >
+                {{ $lot->image }}
+            </button>
+
+        </div>
+
+    @else
+
+        <span class="text-sm text-gray-400">
+            No image
+        </span>
+
+    @endif
+
+</td>
 
 
-                            <!-- Lot Number -->
 
-                            <td class="px-6 py-5">
 
-                                <span class="font-bold text-indigo-600">
-                                    #{{ $lot->lot_number }}
-                                </span>
+
+                            {{-- Lot --}}
+                            <td class="px-6 py-4">
+
+                                <a
+                                    href="{{ route('lots.show', $lot) }}"
+                                    class="font-semibold text-indigo-600 hover:underline"
+                                >
+                                    {{ $lot->lot_number }}
+                                </a>
+
+                                <p class="text-sm text-slate-500">
+                                    {{ $lot->title }}
+                                </p>
 
                             </td>
 
 
+                            {{-- Auction --}}
+                            <td class="px-6 py-4 text-sm">
 
-                            <!-- Item -->
+                                {{ $lot->auction->name ?? 'No Auction' }}
 
-                            <td class="px-6 py-5">
-
-                                <div class="flex items-center gap-3">
+                            </td>
 
 
-                                    @if($lot->image)
+                            {{-- Starting --}}
+                            <td class="px-6 py-4 font-semibold">
 
-                                        <img
-                                            src="{{ asset('storage/' . $lot->image) }}"
-                                            class="w-12 h-12 rounded-lg object-cover"
+                                £{{ number_format($lot->starting_price, 2) }}
+
+                            </td>
+
+
+                            {{-- Current --}}
+                            <td class="px-6 py-4 font-bold text-indigo-600">
+
+                                £{{ number_format($lot->current_bid, 2) }}
+
+                            </td>
+
+
+                            {{-- Bids --}}
+                            <td class="px-6 py-4">
+
+                                {{ $lot->bids_count }}
+
+                            </td>
+
+
+                            {{-- Status --}}
+                            <td class="px-6 py-4">
+
+                                @if($lot->status === 'available')
+
+                                    <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                                        Available
+                                    </span>
+
+                                @elseif($lot->status === 'sold')
+
+                                    <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                                        Sold
+                                    </span>
+
+                                @else
+
+                                    <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
+                                        Unsold
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+
+                            {{-- Actions --}}
+                            <td class="px-6 py-4">
+
+                                <div class="flex justify-end items-center gap-2">
+
+
+                                    {{-- View --}}
+                                    <a
+                                        href="{{ route('lots.show', $lot) }}"
+                                        class="px-3 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 text-sm"
+                                    >
+                                        View
+                                    </a>
+
+
+                                    {{-- Edit --}}
+                                    <a
+                                        href="{{ route('lots.edit', $lot) }}"
+                                        class="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 text-sm"
+                                    >
+                                        Edit
+                                    </a>
+
+
+                                    {{-- Delete --}}
+                                    <form
+                                        action="{{ route('lots.destroy', $lot) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Are you sure you want to delete this lot?');"
+                                    >
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm"
                                         >
+                                            Delete
+                                        </button>
 
-                                    @else
-
-                                        <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
-
-                                            <span class="text-slate-400 text-xs">
-                                                No Image
-                                            </span>
-
-                                        </div>
-
-                                    @endif
-
-
-                                    <div>
-
-                                        <p class="font-semibold text-slate-800">
-                                            {{ $lot->title }}
-                                        </p>
-
-                                        <p class="text-xs text-slate-500 max-w-xs truncate">
-                                            {{ $lot->description }}
-                                        </p>
-
-                                    </div>
+                                    </form>
 
                                 </div>
 
                             </td>
 
 
-
-                            <!-- Auction -->
-
-                            <td class="px-6 py-5">
-
-                                @if($lot->auction)
-
-                                    <a
-                                        href="{{ route('auctions.show', $lot->auction) }}"
-                                        class="text-indigo-600 font-medium hover:underline"
-                                    >
-                                        {{ $lot->auction->name }}
-                                    </a>
-
-                                @else
-
-                                    <span class="text-slate-400">
-                                        No Auction
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-
-
-                            <!-- Starting Price -->
-
-                            <td class="px-6 py-5">
-
-                                <span class="font-medium text-slate-700">
-
-                                    £{{ number_format($lot->starting_price, 2) }}
-
-                                </span>
-
-                            </td>
-
-
-
-                            <!-- Current Bid -->
-
-                            <td class="px-6 py-5">
-
-                                <span class="font-bold text-slate-800">
-
-                                    £{{ number_format($lot->current_bid, 2) }}
-
-                                </span>
-
-                            </td>
-
-
-
-                            <!-- Bids -->
-
-                            <td class="px-6 py-5">
-
-                                <span class="bg-slate-100 px-3 py-1 rounded-full text-sm">
-
-                                    {{ $lot->bids_count }}
-
-                                </span>
-
-                            </td>
-
-
-
-                            <!-- Status -->
-
-                            <td class="px-6 py-5">
-
-
-                                @if($lot->status === 'sold')
-
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                                        Sold
-                                    </span>
-
-
-                                @elseif($lot->status === 'available')
-
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                                        Available
-                                    </span>
-
-
-                                @else
-
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                                        Unsold
-                                    </span>
-
-                                @endif
-
-
-                            </td>
-
-
-
-                            <!-- Action -->
-
-                            <td class="px-6 py-5">
-
-                                <a
-                                    href="{{ route('lots.show', $lot) }}"
-                                    class="inline-flex items-center px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition"
-                                >
-                                    View Details
-                                </a>
-
-                            </td>
-
-
                         </tr>
-
 
                     @empty
 
-
                         <tr>
 
-                            <td colspan="8" class="px-6 py-16 text-center">
+                            <td
+                                colspan="8"
+                                class="px-6 py-16 text-center"
+                            >
 
                                 <div class="text-slate-400">
 
@@ -439,8 +279,15 @@
                                     </p>
 
                                     <p class="text-sm mt-1">
-                                        There are currently no lots in the database.
+                                        Create your first lot to get started.
                                     </p>
+
+                                    <a
+                                        href="{{ route('lots.create') }}"
+                                        class="inline-block mt-4 px-5 py-2.5 bg-indigo-600 text-white rounded-lg"
+                                    >
+                                        Create Lot
+                                    </a>
 
                                 </div>
 
@@ -448,37 +295,112 @@
 
                         </tr>
 
-
                     @endforelse
 
+                </tbody>
 
-                    </tbody>
+            </table>
 
-
-                </table>
-
-            </div>
+        </div>
 
 
-            <!-- Pagination -->
+        {{-- Pagination --}}
+        @if($lots->hasPages())
 
-            <div class="px-6 py-5 border-t border-slate-100">
+            <div class="p-5 border-t">
 
                 {{ $lots->links() }}
 
             </div>
 
+        @endif
 
-        </div>
+    </div>
 
+</div>
 
-    </main>
+<!-- LOT IMAGE MODAL -->
 
+<div
+    id="lotImageModal"
+    class="fixed inset-0 z-9999 hidden items-center justify-center bg-black/80 p-5"
+>
+
+    <div class="relative max-w-5xl max-h-[90vh]">
+
+        <!-- Close -->
+        <button
+            type="button"
+            onclick="hideLotImage()"
+            class="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-white text-black text-2xl font-bold shadow-lg hover:bg-gray-200"
+        >
+            ×
+        </button>
+
+        <!-- Image -->
+        <img
+            id="lotModalImage"
+            src=""
+            alt="Lot Image"
+            class="max-w-[90vw] max-h-[85vh] object-contain rounded-xl"
+        >
+
+    </div>
 
 </div>
 
 
-</body>
+<script>
 
-</html>
+function showLotImage(imageUrl)
+{
+    const modal = document.getElementById('lotImageModal');
+    const image = document.getElementById('lotModalImage');
 
+    image.src = imageUrl;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    document.body.style.overflow = 'hidden';
+}
+
+
+function hideLotImage()
+{
+    const modal = document.getElementById('lotImageModal');
+    const image = document.getElementById('lotModalImage');
+
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+
+    image.src = '';
+
+    document.body.style.overflow = '';
+}
+
+
+/* Close by clicking outside image */
+
+document.getElementById('lotImageModal').addEventListener('click', function(event)
+{
+    if (event.target === this)
+    {
+        hideLotImage();
+    }
+});
+
+
+/* Close with ESC */
+
+document.addEventListener('keydown', function(event)
+{
+    if (event.key === 'Escape')
+    {
+        hideLotImage();
+    }
+});
+
+</script>
+
+@endsection

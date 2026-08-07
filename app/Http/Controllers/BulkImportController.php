@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Auction;
 use App\Models\BulkImport;
 use App\Models\Lot;
+use App\Models\LotImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class BulkImportController extends Controller
 {
@@ -59,6 +61,14 @@ class BulkImportController extends Controller
 
     /**
      * Import CSV file.
+     *
+     * Multiple images are supported.
+     *
+     * CSV example:
+     *
+     * lot_number,title,description,starting_price,current_bid,status,images
+     *
+     * LOT-001,Antique Chair,Beautiful chair,500,500,available,chair1.jpg|chair2.jpg|chair3.jpg
      */
     public function store(Request $request)
     {
@@ -83,6 +93,7 @@ class BulkImportController extends Controller
         $handle = fopen($path, 'r');
 
         if (!$handle) {
+
             return back()
                 ->withErrors([
                     'csv_file' => 'Unable to read CSV file.'
@@ -91,10 +102,16 @@ class BulkImportController extends Controller
         }
 
 
-        // Read CSV header
+        /*
+        |--------------------------------------------------------------------------
+        | Read CSV Header
+        |--------------------------------------------------------------------------
+        */
+
         $header = fgetcsv($handle);
 
         if (!$header) {
+
             fclose($handle);
 
             return back()
@@ -105,7 +122,12 @@ class BulkImportController extends Controller
         }
 
 
-        // Remove BOM if present
+        /*
+        |--------------------------------------------------------------------------
+        | Remove BOM
+        |--------------------------------------------------------------------------
+        */
+
         $header[0] = preg_replace(
             '/^\xEF\xBB\xBF/',
             '',
@@ -113,11 +135,23 @@ class BulkImportController extends Controller
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Normalize Header
+        |--------------------------------------------------------------------------
+        */
+
         $header = array_map(
             fn ($value) => strtolower(trim($value)),
             $header
         );
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Required Columns
+        |--------------------------------------------------------------------------
+        */
 
         $requiredColumns = [
             'lot_number',
@@ -126,7 +160,7 @@ class BulkImportController extends Controller
             'starting_price',
             'current_bid',
             'status',
-            'image',
+            'images',
         ];
 
 
@@ -139,12 +173,18 @@ class BulkImportController extends Controller
                 return back()
                     ->withErrors([
                         'csv_file' =>
-                        "Missing required column: {$column}"
+                            "Missing required column: {$column}"
                     ])
                     ->withInput();
             }
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Counters
+        |--------------------------------------------------------------------------
+        */
 
         $totalRows = 0;
 
@@ -158,10 +198,36 @@ class BulkImportController extends Controller
 
         try {
 
+            /*
+            |--------------------------------------------------------------------------
+            | Read Each CSV Row
+            |--------------------------------------------------------------------------
+            */
+
             while (($row = fgetcsv($handle)) !== false) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Ignore Completely Empty Rows
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    count($row) === 1 &&
+                    trim($row[0]) === ''
+                ) {
+                    continue;
+                }
+
 
                 $totalRows++;
 
+
+                /*
+                |--------------------------------------------------------------------------
+                | Make Sure Column Count Matches
+                |--------------------------------------------------------------------------
+                */
 
                 if (count($row) !== count($header)) {
 
@@ -177,9 +243,15 @@ class BulkImportController extends Controller
                 );
 
 
+                /*
+                |--------------------------------------------------------------------------
+                | Required Lot Data
+                |--------------------------------------------------------------------------
+                */
+
                 if (
-                    empty($data['lot_number']) ||
-                    empty($data['title'])
+                    empty(trim($data['lot_number'] ?? '')) ||
+                    empty(trim($data['title'] ?? ''))
                 ) {
 
                     $failedRows++;
@@ -188,9 +260,20 @@ class BulkImportController extends Controller
                 }
 
 
+                $lotNumber = trim(
+                    $data['lot_number']
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Prevent Duplicate Lot Numbers
+                |--------------------------------------------------------------------------
+                */
+
                 $lotExists = Lot::where(
                     'lot_number',
-                    trim($data['lot_number'])
+                    $lotNumber
                 )->exists();
 
 
@@ -202,48 +285,145 @@ class BulkImportController extends Controller
                 }
 
 
-                Lot::create([
+                /*
+                |--------------------------------------------------------------------------
+                | Validate Status
+                |--------------------------------------------------------------------------
+                */
+
+                $status = strtolower(
+                    trim($data['status'] ?? 'available')
+                );
+
+
+                if (!in_array($status, [
+                    'available',
+                    'sold',
+                    'unsold'
+                ])) {
+
+                    $status = 'available';
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Create Lot
+                |--------------------------------------------------------------------------
+                */
+
+                $lot = Lot::create([
 
                     'auction_id' =>
                         $request->auction_id,
 
                     'lot_number' =>
-                        trim($data['lot_number']),
+                        $lotNumber,
 
                     'title' =>
                         trim($data['title']),
 
                     'description' =>
-                        $data['description'] ?? null,
+                        !empty($data['description'])
+                            ? trim($data['description'])
+                            : null,
 
                     'starting_price' =>
-                        is_numeric($data['starting_price'])
+                        is_numeric($data['starting_price'] ?? null)
                             ? $data['starting_price']
                             : 0,
 
                     'current_bid' =>
-                        is_numeric($data['current_bid'])
+                        is_numeric($data['current_bid'] ?? null)
                             ? $data['current_bid']
                             : 0,
 
                     'status' =>
-                        in_array(
-                            $data['status'],
-                            [
-                                'available',
-                                'sold',
-                                'unsold'
-                            ]
-                        )
-                            ? $data['status']
-                            : 'available',
+                        $status,
 
-                    'image' =>
-                        !empty($data['image'])
-                            ? $data['image']
-                            : null,
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Do NOT store imported images in old
+                    | lots.image column.
+                    |
+                    | Images are stored in lot_images table.
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'image' => null,
                 ]);
 
+
+                /*
+                |--------------------------------------------------------------------------
+                | Multiple Images
+                |--------------------------------------------------------------------------
+                |
+                | CSV format:
+                |
+                | image1.jpg|image2.jpg|image3.jpg
+                |
+                */
+
+                $images = trim(
+                    $data['images'] ?? ''
+                );
+
+
+                if ($images !== '') {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Split images using |
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $imageList = explode(
+                        '|',
+                        $images
+                    );
+
+
+                    foreach ($imageList as $image) {
+
+                        $image = trim($image);
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Ignore Empty Image Names
+                        |--------------------------------------------------------------------------
+                        */
+
+                        if ($image === '') {
+                            continue;
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Save Image
+                        |--------------------------------------------------------------------------
+                        */
+
+                        LotImage::create([
+
+                            'lot_id' =>
+                                $lot->id,
+
+                            'image' =>
+                                $image,
+
+                        ]);
+                    }
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Successful Row
+                |--------------------------------------------------------------------------
+                */
 
                 $successfulRows++;
             }
@@ -251,6 +431,12 @@ class BulkImportController extends Controller
 
             fclose($handle);
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Determine Import Status
+            |--------------------------------------------------------------------------
+            */
 
             if ($successfulRows === $totalRows) {
 
@@ -265,6 +451,12 @@ class BulkImportController extends Controller
                 $status = 'failed';
             }
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Save Import History
+            |--------------------------------------------------------------------------
+            */
 
             BulkImport::create([
 
@@ -288,20 +480,27 @@ class BulkImportController extends Controller
             ]);
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Commit
+            |--------------------------------------------------------------------------
+            */
+
             DB::commit();
 
 
             return redirect()
-                ->route('imports.index')
+                ->route('bulk-imports.index')
                 ->with(
                     'success',
                     "{$successfulRows} lots imported successfully. {$failedRows} rows failed."
                 );
 
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             DB::rollBack();
+
 
             if (is_resource($handle)) {
                 fclose($handle);
@@ -311,7 +510,7 @@ class BulkImportController extends Controller
             return back()
                 ->withErrors([
                     'csv_file' =>
-                    'Import failed: ' . $e->getMessage()
+                        'Import failed: ' . $e->getMessage()
                 ])
                 ->withInput();
         }

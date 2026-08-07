@@ -8,22 +8,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('bidders', function (Blueprint $table) {
-            $table->id();
-            $table->string('bidder_number')->unique();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone')->nullable();
-            $table->string('address')->nullable();
-            $table->string('status')->default('active');
-            $table->decimal('total_bids', 10, 2)->default(0);
-            $table->decimal('total_spent', 12, 2)->default(0);
-            $table->timestamps();
+        Schema::table('bidders', function (Blueprint $table) {
+
+            if (!Schema::hasColumn('bidders', 'status')) {
+                $table->string('status')->default('active');
+            }
+
+            if (!Schema::hasColumn('bidders', 'total_bid_amount')) {
+                $table->decimal('total_bid_amount', 15, 2)->default(0);
+            }
+
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('bidders');
+        Schema::table('bidders', function (Blueprint $table) {
+
+            if (Schema::hasColumn('bidders', 'status')) {
+                $table->dropColumn('status');
+            }
+
+            if (Schema::hasColumn('bidders', 'total_bid_amount')) {
+                $table->dropColumn('total_bid_amount');
+            }
+
+        });
     }
 };

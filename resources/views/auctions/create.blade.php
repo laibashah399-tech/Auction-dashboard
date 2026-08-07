@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
+
 <title>Create Auction - AuctionPro</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -31,7 +31,7 @@
 
 <div class="min-h-screen flex">
 
-```
+
 <!-- Sidebar -->
 <aside class="w-64 bg-slate-900 text-white hidden lg:flex flex-col">
 
@@ -317,8 +317,8 @@
 
                     </div>
 
-
-                    <form action="{{ route('auctions.store') }}" method="POST">
+<form action="{{ route('auctions.store') }}" method="POST" enctype="multipart/form-data">
+                    
 
                         @csrf
 
@@ -458,6 +458,36 @@
                                         value="{{ old('end_at') }}"
                                         class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none"
                                     >
+                                   
+
+<!-- Multiple Images -->
+<div>
+    <label class="block text-sm font-semibold mb-2">
+        Auction Images
+    </label>
+
+    <input
+        type="file"
+        name="images[]"
+        multiple
+        accept="image/*"
+        class="w-full border rounded-xl p-3"
+    >
+</div>
+
+    <p class="text-sm text-slate-500 mt-2">
+        You can select one or more images for this auction.
+    </p>
+
+    @error('images')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+
+    @error('images.*')
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+    @enderror
+
+</div>
 
                                 </div>
 
@@ -590,6 +620,7 @@
                     <p class="text-sm text-indigo-700 mt-2 leading-6">
                         Create your auction first, then add lots and bidders from the auction management section.
                     </p>
+                    
 
                 </div>
 
@@ -600,7 +631,7 @@
     </div>
 
 </main>
-```
+
 
 </div>
 

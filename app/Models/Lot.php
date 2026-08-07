@@ -20,11 +20,6 @@ class Lot extends Model
         'image',
     ];
 
-    protected $casts = [
-        'starting_price' => 'decimal:2',
-        'current_bid' => 'decimal:2',
-    ];
-
     public function auction()
     {
         return $this->belongsTo(Auction::class);
@@ -34,4 +29,8 @@ class Lot extends Model
     {
         return $this->hasMany(Bid::class);
     }
+    public function images()
+{
+    return $this->hasMany(LotImage::class);
+}
 }

@@ -16,4 +16,9 @@ class Bidder extends Model
         'total_bids',
         'total_spent',
     ];
+
+    public function bids()
+    {
+        return $this->hasMany(Bid::class);
+    }
 }
