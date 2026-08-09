@@ -13,15 +13,18 @@ class LotController extends Controller
     /**
      * Display all lots.
      */
-    public function index()
-    {
-        $lots = Lot::with('auction')
-            ->withCount('bids')
-            ->latest()
-            ->paginate(10);
 
-        return view('lots.index', compact('lots'));
-    }
+public function index()
+{
+    $lots = Lot::with('auction')
+        ->withCount('bids')
+        ->orderBy('lot_number', 'asc')
+        ->paginate(10);
+
+    return view('lots.index', compact('lots'));
+}
+
+
 
     /**
      * Show create lot form.

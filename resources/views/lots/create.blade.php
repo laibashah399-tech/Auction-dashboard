@@ -256,9 +256,11 @@
                     </label>
 
                     <input
-                        type="file"
-                        name="image"
-                        accept="image/*"
+                    
+                     type="file"
+                     name="image"
+                    accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp"
+
                         class="w-full px-4 py-3 border border-slate-300 rounded-xl"
                     >
 

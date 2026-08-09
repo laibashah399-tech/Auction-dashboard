@@ -31,24 +31,20 @@ Route::get('/bulk-imports', [
     'index'
 ])->name('bulk-imports.index');
 
-
 Route::get('/bulk-imports/create', [
     BulkImportController::class,
     'create'
 ])->name('bulk-imports.create');
-
 
 Route::post('/bulk-imports', [
     BulkImportController::class,
     'store'
 ])->name('bulk-imports.store');
 
-
 Route::delete('/bulk-imports/{import}', [
     BulkImportController::class,
     'destroy'
-])->name('bulk-imports.destroy');  
-
+])->name('bulk-imports.destroy');
 
 Route::resource('bidders', BidderController::class)
     ->except(['show']);
