@@ -10,14 +10,20 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
         <div>
+
             <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                <a href="{{ route('dashboard') }}" class="hover:text-indigo-600">
+
+                <a
+                    href="{{ route('dashboard') }}"
+                    class="hover:text-indigo-600"
+                >
                     Dashboard
                 </a>
 
                 <span>/</span>
 
                 <span>Bulk Imports</span>
+
             </div>
 
             <h1 class="text-3xl font-bold text-gray-900">
@@ -25,9 +31,21 @@
             </h1>
 
             <p class="text-gray-500 mt-1">
-                Import auctions and lots using CSV or Excel files.
+                Import multiple lots into an auction using CSV files.
             </p>
+
         </div>
+
+        <a
+            href="{{ route('bulk-imports.create') }}"
+            class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
+        >
+
+            <i data-lucide="upload" class="w-5 h-5"></i>
+
+            New Import
+
+        </a>
 
     </div>
 
@@ -49,7 +67,7 @@
 
 
     {{-- Error Messages --}}
-    @if ($errors->any())
+    @if($errors->any())
 
         <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-5 text-red-700">
 
@@ -58,16 +76,18 @@
                 <i data-lucide="alert-circle" class="w-5 h-5"></i>
 
                 <span>
-                    Import Failed
+                    Delete / Import Error
                 </span>
 
             </div>
 
             <ul class="list-disc ml-6 text-sm space-y-1">
 
-                @foreach ($errors->all() as $error)
+                @foreach($errors->all() as $error)
 
-                    <li>{{ $error }}</li>
+                    <li>
+                        {{ $error }}
+                    </li>
 
                 @endforeach
 
@@ -78,167 +98,12 @@
     @endif
 
 
-    {{-- Import Cards --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-
-
-        {{-- Import Lots --}}
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-
-            <div class="flex items-center gap-4 mb-5">
-
-                <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
-
-                    <i data-lucide="package" class="w-6 h-6 text-indigo-600"></i>
-
-                </div>
-
-                <div>
-
-                    <h2 class="text-lg font-semibold text-gray-900">
-                        Import Lots
-                    </h2>
-
-                    <p class="text-sm text-gray-500">
-                        Upload multiple lots at once.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <form action="{{ route('bulk-imports.lots') }}" method="POST" enctype="multipart/form-data">
-
-                @csrf
-
-                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-indigo-400 transition">
-
-                    <i data-lucide="upload-cloud" class="w-10 h-10 mx-auto text-gray-400 mb-3"></i>
-
-                    <p class="font-medium text-gray-700">
-                        Upload Lots File
-                    </p>
-
-                    <p class="text-sm text-gray-500 mt-1 mb-5">
-                        CSV or Excel file
-                    </p>
-
-
-                    <input
-                        type="file"
-                        name="lots_file"
-                        accept=".csv,.xlsx,.xls"
-                        required
-                        class="block w-full text-sm text-gray-500
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-lg file:border-0
-                        file:bg-indigo-50 file:text-indigo-700
-                        hover:file:bg-indigo-100"
-                    >
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="w-full mt-5 flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
-                >
-
-                    <i data-lucide="upload" class="w-5 h-5"></i>
-
-                    Import Lots
-
-                </button>
-
-            </form>
-
-        </div>
-
-
-
-        {{-- Import Auctions --}}
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-
-            <div class="flex items-center gap-4 mb-5">
-
-                <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-
-                    <i data-lucide="gavel" class="w-6 h-6 text-purple-600"></i>
-
-                </div>
-
-                <div>
-
-                    <h2 class="text-lg font-semibold text-gray-900">
-                        Import Auctions
-                    </h2>
-
-                    <p class="text-sm text-gray-500">
-                        Upload multiple auctions at once.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <form action="{{ route('bulk-imports.auctions') }}" method="POST" enctype="multipart/form-data">
-
-                @csrf
-
-                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 transition">
-
-                    <i data-lucide="upload-cloud" class="w-10 h-10 mx-auto text-gray-400 mb-3"></i>
-
-                    <p class="font-medium text-gray-700">
-                        Upload Auctions File
-                    </p>
-
-                    <p class="text-sm text-gray-500 mt-1 mb-5">
-                        CSV or Excel file
-                    </p>
-
-
-                    <input
-                        type="file"
-                        name="auctions_file"
-                        accept=".csv,.xlsx,.xls"
-                        required
-                        class="block w-full text-sm text-gray-500
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-lg file:border-0
-                        file:bg-purple-50 file:text-purple-700
-                        hover:file:bg-purple-100"
-                    >
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="w-full mt-5 flex items-center justify-center gap-2 px-5 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition"
-                >
-
-                    <i data-lucide="upload" class="w-5 h-5"></i>
-
-                    Import Auctions
-
-                </button>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-
-    {{-- Import Statistics --}}
+    {{-- Statistics --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
 
 
-        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+        {{-- Total Imports --}}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
 
             <div class="flex items-center justify-between">
 
@@ -249,14 +114,17 @@
                     </p>
 
                     <h3 class="text-2xl font-bold text-gray-900 mt-1">
-                        24
+                        {{ $totalImports ?? 0 }}
                     </h3>
 
                 </div>
 
                 <div class="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center">
 
-                    <i data-lucide="database" class="w-5 h-5 text-blue-600"></i>
+                    <i
+                        data-lucide="database"
+                        class="w-5 h-5 text-blue-600"
+                    ></i>
 
                 </div>
 
@@ -265,8 +133,8 @@
         </div>
 
 
-
-        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+        {{-- Successful --}}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
 
             <div class="flex items-center justify-between">
 
@@ -277,14 +145,17 @@
                     </p>
 
                     <h3 class="text-2xl font-bold text-green-600 mt-1">
-                        21
+                        {{ $successfulImports ?? 0 }}
                     </h3>
 
                 </div>
 
                 <div class="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center">
 
-                    <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                    <i
+                        data-lucide="check-circle"
+                        class="w-5 h-5 text-green-600"
+                    ></i>
 
                 </div>
 
@@ -293,8 +164,39 @@
         </div>
 
 
+        {{-- Partial --}}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
 
-        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <p class="text-sm text-gray-500">
+                        Partial
+                    </p>
+
+                    <h3 class="text-2xl font-bold text-yellow-600 mt-1">
+                        {{ $partialImports ?? 0 }}
+                    </h3>
+
+                </div>
+
+                <div class="w-11 h-11 bg-yellow-100 rounded-xl flex items-center justify-center">
+
+                    <i
+                        data-lucide="alert-triangle"
+                        class="w-5 h-5 text-yellow-600"
+                    ></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- Failed --}}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
 
             <div class="flex items-center justify-between">
 
@@ -305,42 +207,17 @@
                     </p>
 
                     <h3 class="text-2xl font-bold text-red-600 mt-1">
-                        2
+                        {{ $failedImports ?? 0 }}
                     </h3>
 
                 </div>
 
                 <div class="w-11 h-11 bg-red-100 rounded-xl flex items-center justify-center">
 
-                    <i data-lucide="x-circle" class="w-5 h-5 text-red-600"></i>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="bg-white rounded-2xl border border-gray-200 p-5">
-
-            <div class="flex items-center justify-between">
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-                        Records Imported
-                    </p>
-
-                    <h3 class="text-2xl font-bold text-indigo-600 mt-1">
-                        1,240
-                    </h3>
-
-                </div>
-
-                <div class="w-11 h-11 bg-indigo-100 rounded-xl flex items-center justify-center">
-
-                    <i data-lucide="layers" class="w-5 h-5 text-indigo-600"></i>
+                    <i
+                        data-lucide="x-circle"
+                        class="w-5 h-5 text-red-600"
+                    ></i>
 
                 </div>
 
@@ -351,189 +228,341 @@
     </div>
 
 
-
     {{-- Recent Import History --}}
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
 
-        <div class="px-6 py-5 border-b border-gray-200">
+        <div class="px-6 py-5 border-b border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
-            <h2 class="text-lg font-semibold text-gray-900">
-                Recent Import History
-            </h2>
+            <div>
 
-            <p class="text-sm text-gray-500 mt-1">
-                Latest bulk import activities.
-            </p>
+                <h2 class="text-lg font-semibold text-gray-900">
+                    Recent Import History
+                </h2>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Latest bulk import activities.
+                </p>
+
+            </div>
+
+            <a
+                href="{{ route('bulk-imports.create') }}"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition"
+            >
+
+                <i data-lucide="plus" class="w-4 h-4"></i>
+
+                Import CSV
+
+            </a>
 
         </div>
 
 
-        <div class="overflow-x-auto">
+        @if($imports->count())
 
-            <table class="w-full">
+            <div class="overflow-x-auto">
 
-                <thead class="bg-gray-50">
+                <table class="w-full">
 
-                    <tr>
+                    <thead class="bg-gray-50">
 
-                        <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
-                            File Name
-                        </th>
+                        <tr>
 
-                        <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
-                            Type
-                        </th>
+                            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                                File Name
+                            </th>
 
-                        <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
-                            Records
-                        </th>
+                            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                                Auction
+                            </th>
 
-                        <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
-                            Status
-                        </th>
+                            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                                Total
+                            </th>
 
-                        <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
-                            Date
-                        </th>
+                            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                                Successful
+                            </th>
 
-                    </tr>
+                            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                                Failed
+                            </th>
 
-                </thead>
+                            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                                Status
+                            </th>
 
+                            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-600">
+                                Date
+                            </th>
 
-                <tbody class="divide-y divide-gray-100">
+                            <th class="text-right px-6 py-4 text-sm font-semibold text-gray-600">
+                                Action
+                            </th>
 
+                        </tr>
 
-                    <tr class="hover:bg-gray-50">
+                    </thead>
 
-                        <td class="px-6 py-5">
 
-                            <div class="flex items-center gap-3">
+                    <tbody class="divide-y divide-gray-100">
 
-                                <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                        @foreach($imports as $import)
 
-                                    <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i>
+                            <tr class="hover:bg-gray-50 transition">
 
-                                </div>
+                                {{-- File Name --}}
+                                <td class="px-6 py-5">
 
-                                <div>
+                                    <div class="flex items-center gap-3">
 
-                                    <p class="font-medium text-gray-900">
-                                        antique-lots.csv
-                                    </p>
+                                        <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
 
-                                    <p class="text-xs text-gray-500">
-                                        Imported by Admin User
-                                    </p>
+                                            <i
+                                                data-lucide="file-spreadsheet"
+                                                class="w-5 h-5 text-indigo-600"
+                                            ></i>
 
-                                </div>
+                                        </div>
 
-                            </div>
+                                        <div>
 
-                        </td>
+                                            <p class="font-medium text-gray-900">
+                                                {{ $import->file_name }}
+                                            </p>
 
+                                            <p class="text-xs text-gray-500">
+                                                Import #{{ $import->id }}
+                                            </p>
 
-                        <td class="px-6 py-5">
-                            <span class="text-sm text-gray-700">
-                                Lots
-                            </span>
-                        </td>
+                                        </div>
 
+                                    </div>
 
-                        <td class="px-6 py-5">
-                            <span class="text-sm text-gray-700">
-                                120
-                            </span>
-                        </td>
+                                </td>
 
 
-                        <td class="px-6 py-5">
+                                {{-- Auction --}}
+                                <td class="px-6 py-5">
 
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                    @if($import->auction)
 
-                                <i data-lucide="check" class="w-3 h-3"></i>
+                                        <span class="text-sm text-gray-700">
+                                            {{ $import->auction->name }}
+                                        </span>
 
-                                Completed
+                                    @else
 
-                            </span>
+                                        <span class="text-sm text-gray-400">
+                                            Auction deleted
+                                        </span>
 
-                        </td>
+                                    @endif
 
+                                </td>
 
-                        <td class="px-6 py-5 text-sm text-gray-500">
-                            10 minutes ago
-                        </td>
 
-                    </tr>
+                                {{-- Total --}}
+                                <td class="px-6 py-5">
 
+                                    <span class="text-sm font-medium text-gray-700">
+                                        {{ $import->total_rows }}
+                                    </span>
 
+                                </td>
 
-                    <tr class="hover:bg-gray-50">
 
-                        <td class="px-6 py-5">
+                                {{-- Successful --}}
+                                <td class="px-6 py-5">
 
-                            <div class="flex items-center gap-3">
+                                    <span class="text-sm font-medium text-green-600">
+                                        {{ $import->successful_rows }}
+                                    </span>
 
-                                <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                </td>
 
-                                    <i data-lucide="file-spreadsheet" class="w-5 h-5 text-purple-600"></i>
 
-                                </div>
+                                {{-- Failed --}}
+                                <td class="px-6 py-5">
 
-                                <div>
+                                    <span class="text-sm font-medium text-red-600">
+                                        {{ $import->failed_rows }}
+                                    </span>
 
-                                    <p class="font-medium text-gray-900">
-                                        upcoming-auctions.xlsx
-                                    </p>
+                                </td>
 
-                                    <p class="text-xs text-gray-500">
-                                        Imported by Admin User
-                                    </p>
 
-                                </div>
+                                {{-- Status --}}
+                                <td class="px-6 py-5">
 
-                            </div>
+                                    @if($import->status === 'completed')
 
-                        </td>
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
 
+                                            <i
+                                                data-lucide="check"
+                                                class="w-3 h-3"
+                                            ></i>
 
-                        <td class="px-6 py-5">
-                            <span class="text-sm text-gray-700">
-                                Auctions
-                            </span>
-                        </td>
+                                            Completed
 
+                                        </span>
 
-                        <td class="px-6 py-5">
-                            <span class="text-sm text-gray-700">
-                                15
-                            </span>
-                        </td>
+                                    @elseif($import->status === 'partial')
 
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
 
-                        <td class="px-6 py-5">
+                                            <i
+                                                data-lucide="alert-triangle"
+                                                class="w-3 h-3"
+                                            ></i>
 
-                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                            Partial
 
-                                <i data-lucide="check" class="w-3 h-3"></i>
+                                        </span>
 
-                                Completed
+                                    @else
 
-                            </span>
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
 
-                        </td>
+                                            <i
+                                                data-lucide="x"
+                                                class="w-3 h-3"
+                                            ></i>
 
+                                            Failed
 
-                        <td class="px-6 py-5 text-sm text-gray-500">
-                            1 hour ago
-                        </td>
+                                        </span>
 
-                    </tr>
+                                    @endif
 
+                                </td>
 
 
-                    <tr class="hover:bg-gray-50">
+                                {{-- Date --}}
+                                <td class="px-6 py-5">
 
-                        <td class="px-6 py-5">
+                                    <span class="text-sm text-gray-500">
 
-                            <div class="flex
+                                        {{ $import->created_at?->format('d M Y, h:i A') }}
+
+                                    </span>
+
+                                </td>
+
+
+                                {{-- Delete --}}
+                                <td class="px-6 py-5">
+
+                                    <div class="flex items-center justify-end">
+
+                                        <form
+                                            action="{{ route('bulk-imports.destroy', $import->id) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('Are you sure you want to delete this import? This will also delete its imported lots and their images.');"
+                                        >
+
+                                            @csrf
+
+                                            @method('DELETE')
+
+                                            <button
+                                                type="submit"
+                                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition"
+                                                title="Delete Import"
+                                            >
+
+                                                <i
+                                                    data-lucide="trash-2"
+                                                    class="w-4 h-4"
+                                                ></i>
+
+                                                Delete
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            {{-- Pagination --}}
+            @if($imports->hasPages())
+
+                <div class="px-6 py-5 border-t border-gray-200">
+
+                    {{ $imports->links() }}
+
+                </div>
+
+            @endif
+
+
+        @else
+
+            {{-- Empty State --}}
+            <div class="px-6 py-16 text-center">
+
+                <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gray-100 flex items-center justify-center">
+
+                    <i
+                        data-lucide="file-x"
+                        class="w-8 h-8 text-gray-400"
+                    ></i>
+
+                </div>
+
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                    No imports found
+                </h3>
+
+                <p class="text-sm text-gray-500 mb-6">
+                    You have not imported any lots yet.
+                </p>
+
+                <a
+                    href="{{ route('bulk-imports.create') }}"
+                    class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
+                >
+
+                    <i data-lucide="upload" class="w-5 h-5"></i>
+
+                    Start Your First Import
+
+                </a>
+
+            </div>
+
+        @endif
+
+    </div>
+
+</div>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+    });
+
+</script>
+
+@endsection

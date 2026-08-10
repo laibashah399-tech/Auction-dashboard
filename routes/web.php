@@ -41,11 +41,14 @@ Route::post('/bulk-imports', [
     'store'
 ])->name('bulk-imports.store');
 
-Route::delete('/bulk-imports/{import}', [
+// Route::delete('/bulk-imports/{import}', [
+//     BulkImportController::class,
+//     'destroy'
+// ])->name('bulk-imports.destroy');
+Route::delete('/bulk-imports/{bulkImport}', [
     BulkImportController::class,
     'destroy'
 ])->name('bulk-imports.destroy');
-
 Route::resource('bidders', BidderController::class)
     ->except(['show']);
 

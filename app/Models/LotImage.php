@@ -2,18 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LotImage extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'lot_id',
         'image',
     ];
 
-    public function lot(): BelongsTo
+    /**
+     * Lot relationship.
+     */
+    public function lot()
     {
         return $this->belongsTo(Lot::class);
     }
 }
+

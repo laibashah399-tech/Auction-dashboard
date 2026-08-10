@@ -162,58 +162,161 @@
 
 
                         {{-- IMAGE --}}
-                        <td class="px-5 py-5 align-middle">
 
-                            @if($lot->image && Storage::disk('public')->exists($lot->image))
+<td class="px-5 py-5 align-middle">
 
-                                <button
-                                    type="button"
-                                    onclick="showLotImage('{{ asset('storage/' . $lot->image) }}')"
-                                    class="block focus:outline-none"
-                                >
+    @php
+        $galleryImages = [];
 
-                                    <img
-                                        src="{{ asset('storage/' . $lot->image) }}"
-                                        alt="{{ $lot->title }}"
-                                        class="w-16 h-16 object-cover rounded-xl
-                                               border border-slate-200
-                                               shadow-sm
-                                               hover:shadow-md
-                                               hover:scale-105
-                                               transition-all duration-200"
-                                    >
+        /*
+        |--------------------------------------------------------------------------
+        | Main image
+        |--------------------------------------------------------------------------
+        */
 
-                                </button>
+        if (
+            $lot->image &&
+            Storage::disk('public')->exists($lot->image)
+        ) {
+            $galleryImages[] = asset(
+                'storage/' . $lot->image
+            );
+        }
 
-                            @elseif($lot->image)
+        /*
+        |--------------------------------------------------------------------------
+        | Additional images
+        |--------------------------------------------------------------------------
+        */
 
-                                <div class="w-16 h-16 rounded-xl bg-red-50 border border-red-100
-                                            flex items-center justify-center">
+        foreach ($lot->images as $lotImage) {
 
-                                    <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                              d="M12 9v3m0 4h.01M10.3 4.6L2.9 17.4A2 2 0 004.6 20h14.8a2 2 0 001.7-2.6L13.7 4.6a2 2 0 00-3.4 0z"/>
-                                    </svg>
+            if (
+                $lotImage->image &&
+                Storage::disk('public')->exists(
+                    $lotImage->image
+                )
+            ) {
 
-                                </div>
+                $imageUrl = asset(
+                    'storage/' . $lotImage->image
+                );
 
-                            @else
+                /*
+                |--------------------------------------------------------------------------
+                | Prevent duplicate main image
+                |--------------------------------------------------------------------------
+                */
 
-                                <div class="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200
-                                            flex items-center justify-center">
+                if (!in_array($imageUrl, $galleryImages)) {
+                    $galleryImages[] = $imageUrl;
+                }
+            }
+        }
+    @endphp
 
-                                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                              d="M4 16l4.5-5 3.5 4 2.5-3 5.5 6M5 20h14a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v14a1 1 0 001 1z"/>
-                                    </svg>
 
-                                </div>
+    @if(count($galleryImages) > 0)
 
-                            @endif
+        <button
+            type="button"
+            onclick='showLotGallery(
+                @json($galleryImages),
+                @json($lot->lot_number),
+                @json($lot->title)
+            )'
+            class="block focus:outline-none"
+        >
 
-                        </td>
+            <div class="relative">
+
+                {{-- Only FIRST image thumbnail --}}
+                <img
+                    src="{{ $galleryImages[0] }}"
+                    alt="{{ $lot->title }}"
+                    class="w-16 h-16 object-cover rounded-xl
+                           border border-slate-200
+                           shadow-sm
+                           hover:shadow-md
+                           hover:scale-105
+                           transition-all duration-200"
+                >
+
+                {{-- Image count --}}
+                @if(count($galleryImages) > 1)
+
+                    <span
+                        class="absolute -right-2 -top-2
+                               min-w-6 h-6 px-1.5
+                               flex items-center justify-center
+                               rounded-full
+                               bg-indigo-600
+                               text-white
+                               text-[10px]
+                               font-bold
+                               shadow"
+                    >
+                        {{ count($galleryImages) }}
+                    </span>
+
+                @endif
+
+            </div>
+
+        </button>
+
+    @elseif($lot->image)
+
+        <div
+            class="w-16 h-16 rounded-xl
+                   bg-red-50 border border-red-100
+                   flex items-center justify-center"
+        >
+
+            <svg
+                class="w-6 h-6 text-red-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+                    d="M12 9v3m0 4h.01M10.3 4.6L2.9 17.4A2 2 0 004.6 20h14.8a2 2 0 001.7-2.6L13.7 4.6a2 2 0 00-3.4 0z"
+                />
+            </svg>
+
+        </div>
+
+    @else
+
+        <div
+            class="w-16 h-16 rounded-xl
+                   bg-slate-100 border border-slate-200
+                   flex items-center justify-center"
+        >
+
+            <svg
+                class="w-6 h-6 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+                    d="M4 16l4.5-5 3.5 4 2.5-3 5.5 6M5 20h14a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v14a1 1 0 001 1z"
+                />
+            </svg>
+
+        </div>
+
+    @endif
+
+</td>
+
 
 
                         {{-- LOT --}}
@@ -495,94 +598,335 @@
 
 </div>
 
-{{-- IMAGE MODAL --}}
+
+{{-- IMAGE GALLERY MODAL --}}
 
 <div
     id="lotImageModal"
-    class="hidden fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm
-           items-center justify-center p-6"
-    onclick="hideLotImage()"
+    class="fixed inset-0 z-[9999] hidden"
+    aria-hidden="true"
 >
 
+    {{-- Background --}}
+    <div
+        class="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onclick="hideLotGallery()"
+    ></div>
 
-<div
-    class="relative max-w-5xl max-h-[90vh]"
-    onclick="event.stopPropagation()"
->
 
-    <button
-        type="button"
-        onclick="hideLotImage()"
-        class="absolute -top-4 -right-4 z-10
-               w-10 h-10 rounded-full
-               bg-white text-slate-800
-               text-2xl font-bold shadow-lg
-               hover:bg-slate-100 transition"
+    {{-- Modal --}}
+    <div
+        class="relative z-10
+               w-full h-full
+               flex items-center justify-center
+               p-4 sm:p-8"
     >
-        ×
-    </button>
 
-    <img
-        id="lotModalImage"
-        src=""
-        alt="Lot Image"
-        class="max-w-[90vw] max-h-[85vh]
-               object-contain rounded-2xl shadow-2xl"
-    >
+        <div
+            class="relative
+                   w-full max-w-5xl
+                   max-h-[95vh]
+                   bg-white
+                   rounded-2xl
+                   shadow-2xl
+                   overflow-hidden
+                   flex flex-col"
+        >
+
+            {{-- Header --}}
+            <div
+                class="flex items-center justify-between
+                       gap-4
+                       px-5 py-4
+                       border-b border-slate-200"
+            >
+
+                <div class="min-w-0">
+
+                    <p
+                        id="lotModalNumber"
+                        class="text-xs font-bold
+                               text-indigo-600 uppercase"
+                    ></p>
+
+                    <h2
+                        id="lotModalTitle"
+                        class="text-lg sm:text-xl
+                               font-bold text-slate-800
+                               truncate"
+                    ></h2>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    onclick="hideLotGallery()"
+                    class="flex-shrink-0
+                           w-10 h-10
+                           rounded-full
+                           bg-slate-100
+                           text-slate-700
+                           text-2xl
+                           hover:bg-slate-200
+                           transition"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            {{-- Image Area --}}
+            <div
+                class="relative
+                       flex-1
+                       bg-slate-950
+                       min-h-[400px]
+                       flex items-center justify-center"
+            >
+
+                <img
+                    id="lotModalImage"
+                    src=""
+                    alt=""
+                    class="max-w-full
+                           max-h-[70vh]
+                           object-contain
+                           select-none"
+                >
+
+
+                {{-- Previous --}}
+                <button
+                    id="lotPrevButton"
+                    type="button"
+                    onclick="previousLotImage()"
+                    class="absolute left-4
+                           w-11 h-11
+                           rounded-full
+                           bg-white/90
+                           text-slate-800
+                           text-2xl
+                           shadow-lg
+                           hover:bg-white
+                           transition"
+                >
+                    ‹
+                </button>
+
+
+                {{-- Next --}}
+                <button
+                    id="lotNextButton"
+                    type="button"
+                    onclick="nextLotImage()"
+                    class="absolute right-4
+                           w-11 h-11
+                           rounded-full
+                           bg-white/90
+                           text-slate-800
+                           text-2xl
+                           shadow-lg
+                           hover:bg-white
+                           transition"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            {{-- Footer --}}
+            <div
+                class="flex items-center
+                       justify-center
+                       gap-3
+                       px-5 py-4
+                       border-t border-slate-200
+                       bg-white"
+            >
+
+                <span
+                    id="lotImageCounter"
+                    class="text-sm font-semibold
+                           text-slate-600"
+                >
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-
-</div>
-
-{{-- Image Modal JavaScript --}}
 
 <script>
 
-    function showLotImage(imageUrl) {
+    let lotGalleryImages = [];
+    let currentLotImageIndex = 0;
 
-        const modal = document.getElementById('lotImageModal');
-        const image = document.getElementById('lotModalImage');
 
-        if (!modal || !image) {
+    function showLotGallery(images, lotNumber, title)
+    {
+        lotGalleryImages = images || [];
+        currentLotImageIndex = 0;
+
+        if (lotGalleryImages.length === 0) {
             return;
         }
 
-        image.src = imageUrl;
+        document.getElementById('lotModalNumber').textContent =
+            'Lot #' + lotNumber;
+
+        document.getElementById('lotModalTitle').textContent =
+            title;
+
+        updateLotGallery();
+
+        const modal =
+            document.getElementById('lotImageModal');
 
         modal.classList.remove('hidden');
-        modal.classList.add('flex');
 
         document.body.classList.add('overflow-hidden');
     }
 
 
-    function hideLotImage() {
+    function updateLotGallery()
+    {
+        const image =
+            document.getElementById('lotModalImage');
 
-        const modal = document.getElementById('lotImageModal');
-        const image = document.getElementById('lotModalImage');
+        const counter =
+            document.getElementById('lotImageCounter');
 
-        if (!modal || !image) {
-            return;
+        const previous =
+            document.getElementById('lotPrevButton');
+
+        const next =
+            document.getElementById('lotNextButton');
+
+
+        image.src =
+            lotGalleryImages[currentLotImageIndex];
+
+
+        counter.textContent =
+            `${currentLotImageIndex + 1} / ${lotGalleryImages.length}`;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Hide navigation when only one image exists
+        |--------------------------------------------------------------------------
+        */
+
+        if (lotGalleryImages.length <= 1) {
+
+            previous.classList.add('hidden');
+            next.classList.add('hidden');
+
+        } else {
+
+            previous.classList.remove('hidden');
+            next.classList.remove('hidden');
         }
-
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-
-        image.src = '';
-
-        document.body.classList.remove('overflow-hidden');
     }
 
 
+    function previousLotImage()
+    {
+        if (lotGalleryImages.length <= 1) {
+            return;
+        }
+
+        currentLotImageIndex--;
+
+        if (currentLotImageIndex < 0) {
+            currentLotImageIndex =
+                lotGalleryImages.length - 1;
+        }
+
+        updateLotGallery();
+    }
+
+
+    function nextLotImage()
+    {
+        if (lotGalleryImages.length <= 1) {
+            return;
+        }
+
+        currentLotImageIndex++;
+
+        if (
+            currentLotImageIndex >=
+            lotGalleryImages.length
+        ) {
+            currentLotImageIndex = 0;
+        }
+
+        updateLotGallery();
+    }
+
+
+    function hideLotGallery()
+    {
+        const modal =
+            document.getElementById('lotImageModal');
+
+        modal.classList.add('hidden');
+
+        document.body.classList.remove('overflow-hidden');
+
+        document.getElementById('lotModalImage').src = '';
+
+        lotGalleryImages = [];
+        currentLotImageIndex = 0;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Keyboard navigation
+    |--------------------------------------------------------------------------
+    */
+
     document.addEventListener('keydown', function(event) {
 
+        const modal =
+            document.getElementById('lotImageModal');
+
+        if (
+            !modal ||
+            modal.classList.contains('hidden')
+        ) {
+            return;
+        }
+
+
         if (event.key === 'Escape') {
-            hideLotImage();
+            hideLotGallery();
+        }
+
+
+        if (event.key === 'ArrowLeft') {
+            previousLotImage();
+        }
+
+
+        if (event.key === 'ArrowRight') {
+            nextLotImage();
         }
 
     });
 
 </script>
+
+
+
 
 @endsection

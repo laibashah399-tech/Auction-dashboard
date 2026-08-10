@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Auction;
 use App\Models\BulkImport;
 use App\Models\Lot;
+use App\Models\LotImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -64,10 +65,10 @@ class BulkImportController extends Controller
      * Supported image values:
      *
      * 1. Windows local path
-     *    C:/Users/PMLS/Downloads/watch.jpg
+     *    C:\images\image1.jpg
      *
-     * 2. Windows path with backslashes
-     *    C:\Users\PMLS\Downloads\watch.jpg
+     * 2. Multiple Windows paths
+     *    C:\images\image1.jpg|C:\images\image2.jpg
      *
      * 3. Laravel public storage path
      *    lots/watch.jpg
@@ -81,8 +82,7 @@ class BulkImportController extends Controller
      * 6. Base64
      *    data:image/png;base64,...
      *
-     * The image is copied to:
-     *
+     * Images are copied to:
      * storage/app/public/lots/
      */
     public function store(Request $request)
@@ -97,7 +97,7 @@ class BulkImportController extends Controller
                 'required',
                 'file',
                 'mimes:csv,txt',
-                'max:5120',
+                'max:512000',
             ],
         ]);
 
@@ -164,11 +164,13 @@ class BulkImportController extends Controller
         */
 
         $header = array_map(function ($value) {
-            return strtolower(
-                trim(
-                    preg_replace('/^\xEF\xBB\xBF/', '', (string) $value)
-                )
+            $value = preg_replace(
+                '/^\xEF\xBB\xBF/',
+                '',
+                (string) $value
             );
+
+            return strtolower(trim($value));
         }, $header);
 
         /*
@@ -181,7 +183,11 @@ class BulkImportController extends Controller
             in_array('image', $header, true) &&
             !in_array('images', $header, true)
         ) {
-            $imageIndex = array_search('image', $header, true);
+            $imageIndex = array_search(
+                'image',
+                $header,
+                true
+            );
 
             if ($imageIndex !== false) {
                 $header[$imageIndex] = 'images';
@@ -194,8 +200,6 @@ class BulkImportController extends Controller
         |--------------------------------------------------------------------------
         |
         | Image is intentionally NOT required.
-        |
-        | This means a CSV without an image can still import.
         |
         */
 
@@ -231,7 +235,11 @@ class BulkImportController extends Controller
             $header[] = 'images';
         }
 
-        $imagesIndex = array_search('images', $header, true);
+        $imagesIndex = array_search(
+            'images',
+            $header,
+            true
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -246,7 +254,6 @@ class BulkImportController extends Controller
         DB::beginTransaction();
 
         try {
-
             /*
             |--------------------------------------------------------------------------
             | Create import history
@@ -288,15 +295,13 @@ class BulkImportController extends Controller
                 /*
                 |--------------------------------------------------------------------------
                 | IMPORTANT:
-                |
-                | Base64 image data contains commas.
-                |
-                | If the CSV generator did not correctly quote the image,
-                | fgetcsv can produce extra columns.
-                |
-                | Since images is the LAST column, join all extra
-                | columns back into the images value.
                 |--------------------------------------------------------------------------
+                |
+                | The images column is the LAST column.
+                |
+                | If an image value contains commas, such as Base64,
+                | combine everything from imagesIndex onward.
+                |
                 */
 
                 $expectedColumns = count($header);
@@ -316,7 +321,9 @@ class BulkImportController extends Controller
 
                     $row = array_merge(
                         $firstPart,
-                        [implode(',', $imageParts)]
+                        [
+                            implode(',', $imageParts)
+                        ]
                     );
                 }
 
@@ -336,7 +343,7 @@ class BulkImportController extends Controller
 
                 /*
                 |--------------------------------------------------------------------------
-                | If somehow still invalid, fail only this row
+                | Validate column count
                 |--------------------------------------------------------------------------
                 */
 
@@ -395,18 +402,19 @@ class BulkImportController extends Controller
 
                 /*
                 |--------------------------------------------------------------------------
-                | PROCESS IMAGE
+                | PROCESS MULTIPLE IMAGES
                 |--------------------------------------------------------------------------
                 |
-                | IMPORTANT:
+                | CSV example:
                 |
-                | Image failure does NOT fail the lot.
+                | C:\images\image1.jpg|C:\images\image2.jpg
                 |
-                | The lot will still be imported.
+                | First image becomes the main thumbnail.
+                | All images are stored in lot_images.
                 |
                 */
 
-                $imagePath = null;
+                $imagePaths = [];
 
                 $imageValue = trim(
                     (string) ($data['images'] ?? '')
@@ -414,11 +422,39 @@ class BulkImportController extends Controller
 
                 if ($imageValue !== '') {
 
-                    $imagePath = $this->processImage(
-                        $imageValue,
-                        $csvPath
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Split multiple images using |
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $imageValues = array_filter(
+                        array_map(
+                            'trim',
+                            explode('|', $imageValue)
+                        )
                     );
+
+                    foreach ($imageValues as $singleImage) {
+
+                        $processedImage = $this->processImage(
+                            $singleImage,
+                            $csvPath
+                        );
+
+                        if ($processedImage) {
+                            $imagePaths[] = $processedImage;
+                        }
+                    }
                 }
+
+                /*
+                |--------------------------------------------------------------------------
+                | First image = main thumbnail
+                |--------------------------------------------------------------------------
+                */
+
+                $imagePath = $imagePaths[0] ?? null;
 
                 /*
                 |--------------------------------------------------------------------------
@@ -426,7 +462,7 @@ class BulkImportController extends Controller
                 |--------------------------------------------------------------------------
                 */
 
-                Lot::create([
+                $lot = Lot::create([
                     'auction_id' => $request->auction_id,
 
                     'import_id' => $import->id,
@@ -463,17 +499,35 @@ class BulkImportController extends Controller
                             $data['status'] ?? ''
                         ),
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | First image is main image
+                    |--------------------------------------------------------------------------
+                    */
+
                     'image' => $imagePath,
                 ]);
+
+                /*
+                |--------------------------------------------------------------------------
+                | Save ALL images in lot_images
+                |--------------------------------------------------------------------------
+                */
+
+                foreach ($imagePaths as $path) {
+
+                    LotImage::create([
+                        'lot_id' => $lot->id,
+                        'image' => $path,
+                    ]);
+                }
 
                 $successfulRows++;
             }
 
-            fclose($handle);
-
             /*
             |--------------------------------------------------------------------------
-            | Determine status
+            | Determine import status
             |--------------------------------------------------------------------------
             */
 
@@ -505,6 +559,10 @@ class BulkImportController extends Controller
 
             DB::commit();
 
+            if (is_resource($handle)) {
+                fclose($handle);
+            }
+
             return redirect()
                 ->route('bulk-imports.index')
                 ->with(
@@ -531,6 +589,17 @@ class BulkImportController extends Controller
 
     /**
      * Process any supported image reference.
+     *
+     * Supported:
+     *
+     * C:\images\image1.jpg
+     * C:\images\image1.jpg|C:\images\image2.jpg
+     * https://example.com/image.jpg
+     * lots/image.jpg
+     * storage/lots/image.jpg
+     * Base64 image
+     * public/image.jpg
+     * Relative image path
      */
     private function processImage(
         string $imageValue,
@@ -567,7 +636,6 @@ class BulkImportController extends Controller
                 $matches
             )
         ) {
-
             return $this->saveBase64Image(
                 $matches[1],
                 $matches[2]
@@ -586,7 +654,6 @@ class BulkImportController extends Controller
                 FILTER_VALIDATE_URL
             )
         ) {
-
             return $this->downloadRemoteImage(
                 $imageValue
             );
@@ -594,31 +661,57 @@ class BulkImportController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Normalize Windows path
+        | 3. WINDOWS LOCAL PATH
         |--------------------------------------------------------------------------
+        |
+        | Example:
+        |
+        | C:\images\image1.jpg
+        |
+        | C:\images\image1.jpg|C:\images\image2.jpg
+        |
+        | At this point processImage() receives ONE path,
+        | because store() already splits images using "|".
+        |
         */
 
-        $normalizedPath = str_replace(
+        $windowsPath = trim($imageValue);
+
+        /*
+        | Convert forward slashes to Windows slashes.
+        */
+
+        $windowsPath = str_replace(
+            '/',
             '\\',
-            DIRECTORY_SEPARATOR,
-            $imageValue
+            $windowsPath
+        );
+
+        /*
+        | Remove accidental surrounding quotes again.
+        */
+
+        $windowsPath = trim(
+            $windowsPath,
+            "\"'"
         );
 
         /*
         |--------------------------------------------------------------------------
-        | 3. Absolute local Windows path
+        | Check absolute Windows path
         |--------------------------------------------------------------------------
         */
 
         if (
-            $this->isAbsoluteWindowsPath(
-                $normalizedPath
+            preg_match(
+                '/^[A-Za-z]:[\\\\\/]/',
+                $windowsPath
             ) &&
-            file_exists($normalizedPath)
+            file_exists($windowsPath) &&
+            is_file($windowsPath)
         ) {
-
             return $this->copyLocalImage(
-                $normalizedPath
+                $windowsPath
             );
         }
 
@@ -626,6 +719,12 @@ class BulkImportController extends Controller
         |--------------------------------------------------------------------------
         | 4. Laravel storage path
         |--------------------------------------------------------------------------
+        |
+        | Examples:
+        |
+        | lots/watch.jpg
+        | storage/lots/watch.jpg
+        |
         */
 
         $storagePath = str_replace(
@@ -634,8 +733,13 @@ class BulkImportController extends Controller
             $imageValue
         );
 
+        $storagePath = ltrim(
+            $storagePath,
+            '/'
+        );
+
         /*
-        | Remove /storage/
+        | Remove "storage/" prefix.
         */
 
         if (
@@ -646,12 +750,14 @@ class BulkImportController extends Controller
         ) {
             $storagePath = substr(
                 $storagePath,
-                8
+                strlen('storage/')
             );
         }
 
         /*
+        |--------------------------------------------------------------------------
         | Check public disk
+        |--------------------------------------------------------------------------
         */
 
         if (
@@ -659,7 +765,6 @@ class BulkImportController extends Controller
                 $storagePath
             )
         ) {
-
             return $this->copyStorageImage(
                 $storagePath
             );
@@ -671,19 +776,23 @@ class BulkImportController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        $publicRelativePath = str_replace(
+            ['/', '\\'],
+            DIRECTORY_SEPARATOR,
+            $storagePath
+        );
+
         $publicPath = public_path(
             ltrim(
-                str_replace(
-                    '/',
-                    DIRECTORY_SEPARATOR,
-                    $storagePath
-                ),
+                $publicRelativePath,
                 DIRECTORY_SEPARATOR
             )
         );
 
-        if (file_exists($publicPath)) {
-
+        if (
+            file_exists($publicPath) &&
+            is_file($publicPath)
+        ) {
             return $this->copyLocalImage(
                 $publicPath
             );
@@ -691,23 +800,21 @@ class BulkImportController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 6. Try path relative to Laravel project
+        | 6. Laravel project path
         |--------------------------------------------------------------------------
         */
 
         $projectPath = base_path(
             ltrim(
-                str_replace(
-                    '/',
-                    DIRECTORY_SEPARATOR,
-                    $storagePath
-                ),
+                $publicRelativePath,
                 DIRECTORY_SEPARATOR
             )
         );
 
-        if (file_exists($projectPath)) {
-
+        if (
+            file_exists($projectPath) &&
+            is_file($projectPath)
+        ) {
             return $this->copyLocalImage(
                 $projectPath
             );
@@ -715,25 +822,38 @@ class BulkImportController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 7. Try path relative to CSV directory
+        | 7. Relative path beside CSV
         |--------------------------------------------------------------------------
+        |
+        | Example:
+        |
+        | CSV:
+        | C:\imports\lots.csv
+        |
+        | Image:
+        | images\watch.jpg
+        |
         */
 
         $csvDirectory = dirname($csvPath);
 
+        $relativeImagePath = str_replace(
+            ['/', '\\'],
+            DIRECTORY_SEPARATOR,
+            $imageValue
+        );
+
         $relativePath = $csvDirectory .
             DIRECTORY_SEPARATOR .
             ltrim(
-                str_replace(
-                    '/',
-                    DIRECTORY_SEPARATOR,
-                    $imageValue
-                ),
+                $relativeImagePath,
                 DIRECTORY_SEPARATOR
             );
 
-        if (file_exists($relativePath)) {
-
+        if (
+            file_exists($relativePath) &&
+            is_file($relativePath)
+        ) {
             return $this->copyLocalImage(
                 $relativePath
             );
@@ -744,8 +864,7 @@ class BulkImportController extends Controller
         | Image not found
         |--------------------------------------------------------------------------
         |
-        | IMPORTANT:
-        | Return null instead of failing the CSV row.
+        | Image failure does NOT fail the lot.
         |
         */
 
@@ -793,7 +912,7 @@ class BulkImportController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | If server didn't provide MIME, use URL extension
+            | Determine extension
             |--------------------------------------------------------------------------
             */
 
@@ -801,7 +920,6 @@ class BulkImportController extends Controller
                 $this->extensionFromMime($mime);
 
             if ($extension === null) {
-
                 $extension =
                     $this->extensionFromPath($url);
             }
@@ -823,9 +941,6 @@ class BulkImportController extends Controller
 
     /**
      * Copy local image.
-     *
-     * We intentionally don't require a perfect MIME type.
-     * The extension is used as a fallback.
      */
     private function copyLocalImage(
         string $filePath
@@ -846,6 +961,12 @@ class BulkImportController extends Controller
         if ($contents === false) {
             return null;
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Get extension from path
+        |--------------------------------------------------------------------------
+        */
 
         $extension =
             $this->extensionFromPath(
@@ -945,7 +1066,7 @@ class BulkImportController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Normalize MIME extension
+        | Normalize extension
         |--------------------------------------------------------------------------
         */
 
@@ -954,9 +1075,13 @@ class BulkImportController extends Controller
         );
 
         $extension = match ($extension) {
+
             'jpeg' => 'jpg',
+
             'svg+xml' => 'svg',
+
             'x-icon' => 'ico',
+
             default => $extension,
         };
 
@@ -982,6 +1107,12 @@ class BulkImportController extends Controller
         if ($contents === '') {
             return null;
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Clean extension
+        |--------------------------------------------------------------------------
+        */
 
         $extension = strtolower(
             preg_replace(
@@ -1019,6 +1150,7 @@ class BulkImportController extends Controller
             }
 
         } else {
+
             $baseName = 'lot_image';
         }
 
@@ -1030,6 +1162,12 @@ class BulkImportController extends Controller
             $extension;
 
         $path = 'lots/' . $fileName;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Save to storage/app/public/lots/
+        |--------------------------------------------------------------------------
+        */
 
         $saved = Storage::disk('public')->put(
             $path,
@@ -1098,9 +1236,14 @@ class BulkImportController extends Controller
         string $path
     ): ?string {
 
+        $parsedPath = parse_url(
+            $path,
+            PHP_URL_PATH
+        );
+
         $extension = strtolower(
             pathinfo(
-                parse_url($path, PHP_URL_PATH) ?? $path,
+                $parsedPath ?: $path,
                 PATHINFO_EXTENSION
             )
         );
@@ -1139,9 +1282,7 @@ class BulkImportController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Don't reject unknown extension.
-        |
-        | This keeps the importer flexible for additional image formats.
+        | Don't reject unknown extension
         |--------------------------------------------------------------------------
         */
 
@@ -1151,19 +1292,6 @@ class BulkImportController extends Controller
         )
             ? $extension
             : null;
-    }
-
-    /**
-     * Detect absolute Windows path.
-     */
-    private function isAbsoluteWindowsPath(
-        string $path
-    ): bool {
-
-        return (bool) preg_match(
-            '/^[A-Za-z]:[\\\\\/]/',
-            $path
-        );
     }
 
     /**
@@ -1193,18 +1321,46 @@ class BulkImportController extends Controller
     /**
      * Delete one bulk import and ONLY its lots/images.
      */
-    public function destroy(BulkImport $import)
+    public function destroy($id)
     {
         DB::beginTransaction();
 
         try {
 
+            $import = BulkImport::find($id);
+
+            if (!$import) {
+
+                DB::rollBack();
+
+                return redirect()
+                    ->route('bulk-imports.index')
+                    ->withErrors([
+                        'delete' =>
+                            "Bulk import #{$id} was not found."
+                    ]);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get only lots belonging to this import
+            |--------------------------------------------------------------------------
+            */
+
             $lots = Lot::where(
                 'import_id',
                 $import->id
-            )->get();
+            )
+                ->with('images')
+                ->get();
 
             foreach ($lots as $lot) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Delete main lot image
+                |--------------------------------------------------------------------------
+                */
 
                 if (
                     !empty($lot->image) &&
@@ -1217,8 +1373,42 @@ class BulkImportController extends Controller
                     );
                 }
 
+                /*
+                |--------------------------------------------------------------------------
+                | Delete all multiple images
+                |--------------------------------------------------------------------------
+                */
+
+                foreach ($lot->images as $lotImage) {
+
+                    if (
+                        !empty($lotImage->image) &&
+                        Storage::disk('public')->exists(
+                            $lotImage->image
+                        )
+                    ) {
+                        Storage::disk('public')->delete(
+                            $lotImage->image
+                        );
+                    }
+
+                    $lotImage->delete();
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Delete lot
+                |--------------------------------------------------------------------------
+                */
+
                 $lot->delete();
             }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Delete import record
+            |--------------------------------------------------------------------------
+            */
 
             $import->delete();
 
@@ -1228,14 +1418,15 @@ class BulkImportController extends Controller
                 ->route('bulk-imports.index')
                 ->with(
                     'success',
-                    'Import, its lots and their images were deleted successfully.'
+                    'Import, its lots and all their images were deleted successfully.'
                 );
 
         } catch (Throwable $e) {
 
             DB::rollBack();
 
-            return back()
+            return redirect()
+                ->route('bulk-imports.index')
                 ->withErrors([
                     'delete' =>
                         'Unable to delete import: ' .

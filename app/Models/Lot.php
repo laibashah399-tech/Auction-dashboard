@@ -2,31 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Lot extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-
         'auction_id',
-
         'import_id',
-
         'lot_number',
-
         'title',
-
         'description',
-
         'starting_price',
-
         'current_bid',
-
         'status',
-
         'image',
     ];
 
@@ -65,3 +56,4 @@ class Lot extends Model
         return $this->hasMany(LotImage::class);
     }
 }
+
