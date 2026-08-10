@@ -432,14 +432,6 @@ class="bg-transparent outline-none w-full text-sm">
 
 
                 <div class="flex gap-3">
-<button
-class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50">
-
-    <i data-lucide="download" class="w-4 h-4"></i>
-
-    Export
-
-</button>
 
 
                     <a href="{{ route('auctions.create') }}"
@@ -1076,7 +1068,7 @@ class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 round
 
                 <a href="{{ route('auctions.show',$auction->id) }}">
                 <a href="{{ route('auctions.edit',$auction->id) }}">
-                   class="p-2 hover:bg-gray-100 rounded-lg inline-block">
+                   
 
                     <i data-lucide="more-horizontal"
                        class="w-5 h-5">
@@ -1242,115 +1234,6 @@ class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 round
 
                 </div>
 
-
-                <!-- QUICK ACTIONS -->
-
-                <div class="bg-white rounded-2xl border border-gray-100">
-
-                    <div class="p-6 border-b border-gray-100">
-
-                        <h3 class="text-lg font-bold">
-                            Quick Actions
-                        </h3>
-
-                        <p class="text-sm text-gray-500">
-                            Frequently used actions
-                        </p>
-
-                    </div>
-
-
-                    <div class="p-6 grid grid-cols-2 gap-4">
-
-
-                        <button class="p-5 border border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition text-left">
-
-                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-3">
-
-                                <i data-lucide="gavel"
-                                    class="w-5 h-5">
-                                </i>
-
-                            </div>
-
-                            <p class="font-semibold">
-                                Create Auction
-                            </p>
-
-                            <p class="text-xs text-gray-500 mt-1">
-                                Start a new auction
-                            </p>
-
-                        </button>
-
-
-                        <button class="p-5 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-left">
-
-                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-3">
-
-                                <i data-lucide="upload-cloud"
-                                    class="w-5 h-5">
-                                </i>
-
-                            </div>
-
-                            <p class="font-semibold">
-                                Import Lots
-                            </p>
-
-                            <p class="text-xs text-gray-500 mt-1">
-                                Upload CSV or Excel
-                            </p>
-
-                        </button>
-
-
-                        <button class="p-5 border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition text-left">
-
-                            <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-3">
-
-                                <i data-lucide="images"
-                                    class="w-5 h-5">
-                                </i>
-
-                            </div>
-
-                            <p class="font-semibold">
-                                Upload Images
-                            </p>
-
-                            <p class="text-xs text-gray-500 mt-1">
-                                Match images to lots
-                            </p>
-
-                        </button>
-
-
-                        <button class="p-5 border border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition text-left">
-
-                            <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mb-3">
-
-                                <i data-lucide="file-bar-chart"
-                                    class="w-5 h-5">
-                                </i>
-
-                            </div>
-
-                            <p class="font-semibold">
-                                Generate Report
-                            </p>
-
-                            <p class="text-xs text-gray-500 mt-1">
-                                View auction results
-                            </p>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
 
 
         </main>
