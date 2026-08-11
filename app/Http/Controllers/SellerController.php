@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bidder;
+use App\Models\Seller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
-class BidderController extends Controller
+class SellerController extends Controller
 {
     /**
-     * Display bidders.
+     * Display a listing of sellers.
      */
     public function index(Request $request)
     {
-        $query = Bidder::withCount('bids')
-            ->withSum('bids', 'amount');
+        $query = Seller::query();
 
         // Search
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('company', 'like', "%{$search}%");
             });
         }
 
@@ -31,40 +32,39 @@ class BidderController extends Controller
             $query->where('status', $request->status);
         }
 
-        $bidders = $query
+        // Get sellers
+        $sellers = $query
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        $totalBidders = Bidder::count();
+        // Statistics
+        $totalSellers = Seller::count();
 
-        $activeBidders = Bidder::where('status', 'active')->count();
+        $activeSellers = Seller::where('status', 'active')
+            ->count();
 
-        $inactiveBidders = Bidder::where('status', 'inactive')->count();
+        $inactiveSellers = Seller::where('status', 'inactive')
+            ->count();
 
-        $totalBids = Bidder::withCount('bids')
-            ->get()
-            ->sum('bids_count');
-
-        return view('bidders.index', compact(
-            'bidders',
-            'totalBidders',
-            'activeBidders',
-            'inactiveBidders',
-            'totalBids'
+        return view('sellers.index', compact(
+            'sellers',
+            'totalSellers',
+            'activeSellers',
+            'inactiveSellers'
         ));
     }
 
     /**
-     * Show create form.
+     * Show create seller form.
      */
     public function create()
     {
-        return view('bidders.create');
+        return view('sellers.create');
     }
 
     /**
-     * Store new bidder.
+     * Store a new seller.
      */
     public function store(Request $request)
     {
@@ -79,13 +79,19 @@ class BidderController extends Controller
                 'nullable',
                 'email',
                 'max:255',
-                'unique:bidders,email',
+                'unique:sellers,email',
             ],
 
             'phone' => [
                 'nullable',
                 'string',
-                'max:50',
+                'max:30',
+            ],
+
+            'company' => [
+                'nullable',
+                'string',
+                'max:255',
             ],
 
             'address' => [
@@ -95,13 +101,7 @@ class BidderController extends Controller
 
             'status' => [
                 'required',
-                'in:active,inactive',
-            ],
-
-            'total_bid_amount' => [
-                'nullable',
-                'numeric',
-                'min:0',
+                Rule::in(['active', 'inactive']),
             ],
 
             'notes' => [
@@ -110,37 +110,33 @@ class BidderController extends Controller
             ],
         ]);
 
-        Bidder::create($validated);
+        Seller::create($validated);
 
         return redirect()
-            ->route('bidders.index')
-            ->with('success', 'Bidder created successfully.');
+            ->route('sellers.index')
+            ->with('success', 'Seller created successfully.');
     }
 
     /**
-     * Show bidder.
+     * Display a specific seller.
      */
-    public function show(Bidder $bidder)
+    public function show(Seller $seller)
     {
-        $bidder->load([
-            'bids.lot',
-        ]);
-
-        return view('bidders.show', compact('bidder'));
+        return view('sellers.show', compact('seller'));
     }
 
     /**
-     * Show edit form.
+     * Show edit seller form.
      */
-    public function edit(Bidder $bidder)
+    public function edit(Seller $seller)
     {
-        return view('bidders.edit', compact('bidder'));
+        return view('sellers.edit', compact('seller'));
     }
 
     /**
-     * Update bidder.
+     * Update an existing seller.
      */
-    public function update(Request $request, Bidder $bidder)
+    public function update(Request $request, Seller $seller)
     {
         $validated = $request->validate([
             'name' => [
@@ -153,13 +149,20 @@ class BidderController extends Controller
                 'nullable',
                 'email',
                 'max:255',
-                'unique:bidders,email,' . $bidder->id,
+                Rule::unique('sellers', 'email')
+                    ->ignore($seller->id),
             ],
 
             'phone' => [
                 'nullable',
                 'string',
-                'max:50',
+                'max:30',
+            ],
+
+            'company' => [
+                'nullable',
+                'string',
+                'max:255',
             ],
 
             'address' => [
@@ -169,13 +172,7 @@ class BidderController extends Controller
 
             'status' => [
                 'required',
-                'in:active,inactive',
-            ],
-
-            'total_bid_amount' => [
-                'nullable',
-                'numeric',
-                'min:0',
+                Rule::in(['active', 'inactive']),
             ],
 
             'notes' => [
@@ -184,22 +181,23 @@ class BidderController extends Controller
             ],
         ]);
 
-        $bidder->update($validated);
+        $seller->update($validated);
 
         return redirect()
-            ->route('bidders.index')
-            ->with('success', 'Bidder updated successfully.');
+            ->route('sellers.index')
+            ->with('success', 'Seller updated successfully.');
     }
 
     /**
-     * Delete bidder.
+     * Delete a seller.
      */
-    public function destroy(Bidder $bidder)
+    public function destroy(Seller $seller)
     {
-        $bidder->delete();
+        $seller->delete();
 
         return redirect()
-            ->route('bidders.index')
-            ->with('success', 'Bidder deleted successfully.');
+            ->route('sellers.index')
+            ->with('success', 'Seller deleted successfully.');
     }
 }
+

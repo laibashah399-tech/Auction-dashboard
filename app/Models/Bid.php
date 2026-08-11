@@ -9,7 +9,11 @@ class Bid extends Model
     protected $fillable = [
         'lot_id',
         'bidder_id',
-        'amount'
+        'amount',
+    ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
     ];
 
     public function lot()

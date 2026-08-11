@@ -463,7 +463,7 @@
 
 <div
     id="lotImageModal"
-    class="fixed inset-0 z-[9999] hidden"
+    class="fixed inset-0 z-9999 hidden"
     aria-hidden="true"
 >
 

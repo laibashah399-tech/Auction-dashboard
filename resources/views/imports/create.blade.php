@@ -310,8 +310,7 @@ Upload a CSV file to add multiple lots to an auction.
 
                 <li>• Invalid rows will be marked as failed.</li>
 
-                <li>• Maximum file size is 5MB.</li>
-
+              
             </ul>
 
         </div>

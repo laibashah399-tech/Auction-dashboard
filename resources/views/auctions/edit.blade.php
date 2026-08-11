@@ -4,7 +4,6 @@
 
 <head>
 
-```
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +11,6 @@
 <title>Edit Auction - AuctionPro</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-```
 
 </head>
 
@@ -20,7 +18,6 @@
 
 <div class="min-h-screen flex">
 
-```
 <!-- Sidebar -->
 <aside class="w-64 bg-slate-900 text-white hidden lg:flex flex-col">
 
@@ -66,7 +63,7 @@
         </a>
 
 
-        <a href="#"
+        <a href="{{ route('lots.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">
 
             📦
@@ -75,7 +72,7 @@
         </a>
 
 
-        <a href="#"
+        <a href="{{ route('bidders.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">
 
             👥
@@ -84,7 +81,7 @@
         </a>
 
 
-        <a href="#"
+        <a href="{{ route('payments.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">
 
             💳

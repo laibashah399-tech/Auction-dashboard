@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Create lots table.
+     */
     public function up(): void
     {
         Schema::create('lots', function (Blueprint $table) {
@@ -14,8 +17,14 @@ return new class extends Migration
 
             // Auction Relationship
             $table->foreignId('auction_id')
-                ->constrained()
+                ->constrained('auctions')
                 ->cascadeOnDelete();
+
+            // Bulk Import Relationship
+            $table->foreignId('import_id')
+                ->nullable()
+                ->constrained('bulk_imports')
+                ->nullOnDelete();
 
             // Lot Information
             $table->string('lot_number')->unique();
@@ -54,8 +63,12 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Drop lots table.
+     */
     public function down(): void
     {
         Schema::dropIfExists('lots');
     }
 };
+

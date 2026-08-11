@@ -7,14 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Bidder extends Model
 {
     protected $fillable = [
-        'bidder_number',
         'name',
         'email',
         'phone',
         'address',
         'status',
-        'total_bids',
-        'total_spent',
+        'total_bid_amount',
+        'notes',
+    ];
+
+    protected $casts = [
+        'total_bid_amount' => 'decimal:2',
     ];
 
     public function bids()

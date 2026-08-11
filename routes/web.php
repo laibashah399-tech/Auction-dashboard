@@ -10,6 +10,8 @@ use App\Http\Controllers\BidController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AuctionImageController;
 use App\Http\Controllers\LiveBiddingController;
+use App\Http\Controllers\SellerController;
+use App\Http\Controllers\ShippingPickupController;
 
 
 
@@ -70,3 +72,10 @@ Route::delete('/auction-images/{image}', [AuctionImageController::class, 'destro
 
   Route::get('/live-bidding', [LiveBiddingController::class, 'index'])
     ->name('live-bidding.index');
+
+
+    Route::resource('sellers', SellerController::class);
+
+    
+
+Route::resource('shipping-pickups', ShippingPickupController::class);

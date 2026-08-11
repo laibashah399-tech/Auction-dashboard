@@ -78,7 +78,7 @@
         </a>
 
 
-        <a href="#"
+        <a href="{{ route('lots.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">
 
             <span>📦</span>
@@ -88,7 +88,7 @@
         </a>
 
 
-        <a href="#"
+        <a href="{{ route('bidders.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">
 
             <span>👥</span>
@@ -98,7 +98,7 @@
         </a>
 
 
-        <a href="#"
+        <a href="{{ route('payments.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">
 
             <span>💳</span>

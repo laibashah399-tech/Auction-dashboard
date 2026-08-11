@@ -10,6 +10,14 @@ class Seller extends Model
         'name',
         'email',
         'phone',
+        'company',
         'address',
+        'status',
+        'notes',
     ];
+
+    public function lots()
+    {
+        return $this->hasMany(Lot::class);
+    }
 }

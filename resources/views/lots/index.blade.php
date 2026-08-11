@@ -58,7 +58,7 @@
     <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200
                 text-emerald-700 px-5 py-4 rounded-xl">
 
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M5 13l4 4L19 7"/>
         </svg>
@@ -109,23 +109,23 @@
     {{-- Table Wrapper --}}
     {{-- IMPORTANT: This wrapper handles horizontal scrolling only.
          Nothing inside the table is sticky/fixed. --}}
-    <div class="w-full overflow-x-auto">
+    <div class="overflow-x-auto">
 
-        <table class="w-full min-w-[1100px]">
+        <table class="w-full text-sm text-slate-600">
 
             <thead class="bg-slate-50 border-b border-slate-200">
 
                 <tr>
 
-                    <th class="px-5 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider w-[180px]">
+                    <th class="px-5 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider w-45">
                         Image
                     </th>
 
-                    <th class="px-5 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider min-w-[220px]">
+                    <th class="px-5 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider min-w-55">
                         Lot
                     </th>
 
-                    <th class="px-5 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider min-w-[150px]">
+                    <th class="px-5 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider min-w-37.5">
                         Auction
                     </th>
 
@@ -145,7 +145,7 @@
                         Status
                     </th>
 
-                    <th class="px-5 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider min-w-[220px]">
+                    <th class="px-5 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider min-w-55">
                         Actions
                     </th>
 
@@ -324,7 +324,7 @@
 
                             <div class="flex items-center gap-3">
 
-                                <div class="flex-shrink-0 w-9 h-9 rounded-lg
+                                <div class="shrink-0 w-9 h-9 rounded-lg
                                             bg-indigo-50 text-indigo-600
                                             flex items-center justify-center
                                             text-xs font-bold">
@@ -339,7 +339,7 @@
                                         href="{{ route('lots.show', $lot) }}"
                                         class="block font-semibold text-slate-800
                                                hover:text-indigo-600
-                                               transition-colors truncate max-w-[230px]"
+                                               transition-colors truncate max-w-57.5"
                                     >
                                         {{ $lot->title }}
                                     </a>
@@ -600,10 +600,9 @@
 
 
 {{-- IMAGE GALLERY MODAL --}}
-
 <div
     id="lotImageModal"
-    class="fixed inset-0 z-[9999] hidden"
+    class="fixed inset-0 z-50 hidden"
     aria-hidden="true"
 >
 
@@ -662,7 +661,7 @@
                 <button
                     type="button"
                     onclick="hideLotGallery()"
-                    class="flex-shrink-0
+                    class="shrink-0
                            w-10 h-10
                            rounded-full
                            bg-slate-100
@@ -682,7 +681,7 @@
                 class="relative
                        flex-1
                        bg-slate-950
-                       min-h-[400px]
+                       min-h-100
                        flex items-center justify-center"
             >
 

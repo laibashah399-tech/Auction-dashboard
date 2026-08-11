@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Bidder;
 class Lot extends Model
 {
     use HasFactory;
@@ -54,6 +54,16 @@ class Lot extends Model
     public function images()
     {
         return $this->hasMany(LotImage::class);
+    }
+
+    public function winner()
+{
+    return $this->belongsTo(Bidder::class, 'winning_bidder_id');
+}
+
+    public function shippingPickup()
+    {
+        return $this->hasOne(ShippingPickup::class);
     }
 }
 

@@ -126,22 +126,6 @@
 
 </a>
 
-    
-
-
-
-
-
-            <!-- Media -->
-
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
-
-                <i data-lucide="images" class="w-5 h-5"></i>
-
-                <span>Media Library</span>
-
-            </a>
 
 
             <!-- Live Bidding -->
@@ -189,14 +173,19 @@
 
             <!-- Sellers -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+           <a href="{{ route('sellers.index') }}"
+    class="flex items-center gap-3 px-3 py-3 rounded-lg
+    {{ request()->routeIs('sellers.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 transition' }}">
 
-                <i data-lucide="user-round" class="w-5 h-5"></i>
+    <i data-lucide="user-round" class="w-5 h-5"></i>
 
-                <span>Sellers</span>
+    <span>Sellers</span>
 
-            </a>
+    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+        {{ \App\Models\Seller::count() }}
+    </span>
+
+</a>
 
 
             <!-- Payments -->
@@ -217,14 +206,17 @@
 
             <!-- Fulfillment -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('shipping-pickups.index') }}"
+    class="flex items-center gap-3 px-3 py-3 rounded-lg
+    {{ request()->routeIs('shipping-pickups.*')
+        ? 'bg-indigo-600 text-white'
+        : 'text-slate-300 hover:bg-slate-800' }}
+    transition">
 
-                <i data-lucide="truck" class="w-5 h-5"></i>
+    <i data-lucide="truck" class="w-5 h-5"></i>
 
-                <span>Shipping & Pickup</span>
-
-            </a>
+    <span>Shipping & Pickup</span>
+</a>
 
 
             <!-- Reports -->

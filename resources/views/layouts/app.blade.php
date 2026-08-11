@@ -23,7 +23,7 @@
 
 
     {{-- SIDEBAR --}}
-    <aside class="w-64 bg-slate-900 text-white fixed left-0 top-0 bottom-0 hidden md:flex flex-col">
+    <aside class="w-64 bg-slate-900 text-white fixed left-0 top-0 bottom-0 hidden md:flex flex-col z-50">
 
 
         {{-- LOGO --}}

@@ -7,29 +7,28 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Create sellers table.
+     * Create bidders table.
      */
     public function up(): void
     {
-        Schema::create('sellers', function (Blueprint $table) {
+        Schema::create('bidders', function (Blueprint $table) {
             $table->id();
 
-            // Basic seller information
+            // Basic bidder information
             $table->string('name');
-            $table->string('email')->nullable();
+            $table->string('email')->nullable()->unique();
             $table->string('phone')->nullable();
 
-            // Business information
-            $table->string('company')->nullable();
-
-            // Seller address
+            // Address / profile information
             $table->text('address')->nullable();
 
-            // Seller status
-            $table->enum('status', ['active', 'inactive'])
-                ->default('active');
+            // Bidder status
+            $table->string('status')->default('active');
 
-            // Additional information
+            // Total amount of all bids placed by bidder
+            $table->decimal('total_bid_amount', 15, 2)->default(0);
+
+            // Additional notes
             $table->text('notes')->nullable();
 
             $table->timestamps();
@@ -37,11 +36,11 @@ return new class extends Migration
     }
 
     /**
-     * Drop sellers table.
+     * Drop bidders table.
      */
     public function down(): void
     {
-        Schema::dropIfExists('sellers');
+        Schema::dropIfExists('bidders');
     }
 };
 
