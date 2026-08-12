@@ -12,6 +12,7 @@ use App\Http\Controllers\AuctionImageController;
 use App\Http\Controllers\LiveBiddingController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ShippingPickupController;
+use App\Http\Controllers\ReportController;
 
 
 
@@ -79,3 +80,9 @@ Route::delete('/auction-images/{image}', [AuctionImageController::class, 'destro
     
 
 Route::resource('shipping-pickups', ShippingPickupController::class);
+
+
+Route::get('/reports', [
+    ReportController::class,
+    'index'
+])->name('reports.index');

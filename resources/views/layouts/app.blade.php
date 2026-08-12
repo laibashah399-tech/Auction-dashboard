@@ -144,16 +144,18 @@
 
 
                 {{-- Reports --}}
-                <a href="#"
-                   class="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition">
+             <a href="{{ route('reports.index') }}"
+   class="flex items-center gap-3 px-3 py-3 rounded-lg
+   {{ request()->routeIs('reports.*') ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}
+   transition">
 
-                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
 
-                    <span>
-                        Reports
-                    </span>
+    <span>
+        Reports
+    </span>
 
-                </a>
+</a>
 
 
                 {{-- Settings --}}
