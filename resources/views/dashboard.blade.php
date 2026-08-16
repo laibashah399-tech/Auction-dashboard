@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Auction Admin Dashboard</title>
 
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Heroicons -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
@@ -33,23 +34,36 @@
 
 <div class="flex min-h-screen">
 
-    <!-- ================================= -->
+    <!-- ===================================================== -->
     <!-- SIDEBAR -->
-    <!-- ================================= -->
+    <!-- ===================================================== -->
 
     <aside id="sidebar"
-        class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 text-white
+        transform -translate-x-full lg:translate-x-0
+        transition-transform duration-300">
 
         <!-- Logo -->
+
         <div class="h-20 flex items-center px-6 border-b border-slate-800">
 
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center mr-3">
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl
+                flex items-center justify-center mr-3">
+
                 <i data-lucide="gavel" class="w-6 h-6"></i>
+
             </div>
 
             <div>
-                <h1 class="text-lg font-bold">AuctionPro</h1>
-                <p class="text-xs text-slate-400">Management System</p>
+
+                <h1 class="text-lg font-bold">
+                    AuctionPro
+                </h1>
+
+                <p class="text-xs text-slate-400">
+                    Management System
+                </p>
+
             </div>
 
         </div>
@@ -63,10 +77,15 @@
                 Main Menu
             </p>
 
+
             <!-- Dashboard -->
 
             <a href="{{ route('dashboard') }}"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg bg-indigo-600 text-white">
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('dashboard')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
 
@@ -77,62 +96,72 @@
 
             <!-- Auctions -->
 
-<a href="{{ route('auctions.index') }}"
-    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('auctions.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('auctions.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
-    <i data-lucide="gavel" class="w-5 h-5"></i>
+                <i data-lucide="gavel" class="w-5 h-5"></i>
 
-    <span>Auctions</span>
+                <span>Auctions</span>
 
-    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
-        {{ $totalAuctions }}
-    </span>
+                <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+                    {{ $totalAuctions }}
+                </span>
 
-</a>
-
+            </a>
 
 
             <!-- Lots -->
 
-            
-<a href="{{ route('lots.index') }}"
-    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('lots.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('lots.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
-    <i data-lucide="package" class="w-5 h-5"></i>
+                <i data-lucide="package" class="w-5 h-5"></i>
 
-    <span>Lots</span>
+                <span>Lots</span>
 
-    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
-        {{ $totalLots }}
-    </span>
+                <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+                    {{ $totalLots }}
+                </span>
 
-</a>
-
-
+            </a>
 
 
-            <!-- Bulk-Imports -->
+            <!-- Bulk Imports -->
 
-<a href="{{ route('bulk-imports.index') }}"
-   class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('bulk-imports.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('bulk-imports.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
-    <i data-lucide="upload" class="w-5 h-5"></i>
+                <i data-lucide="upload" class="w-5 h-5"></i>
 
-    <span>Bulk Imports</span>
+                <span>Bulk Imports</span>
 
-    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
-        {{ \App\Models\BulkImport::count() }}
-    </span>
+                <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+                    {{ \App\Models\BulkImport::count() }}
+                </span>
 
-</a>
-
+            </a>
 
 
             <!-- Live Bidding -->
-   <a href="{{ route('live-bidding.index') }}"
-    class="flex items-center gap-3 px-3 py-3 rounded-lg
-    {{ request()->routeIs('live-bidding.*') ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}
-    transition">
+
+            <a href="{{ route('live-bidding.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('live-bidding.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
                 <i data-lucide="radio" class="w-5 h-5"></i>
 
@@ -162,7 +191,11 @@
             <!-- Bidders -->
 
             <a href="{{ route('bidders.index') }}"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('bidders.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
                 <i data-lucide="users" class="w-5 h-5"></i>
 
@@ -173,72 +206,74 @@
 
             <!-- Sellers -->
 
-           <a href="{{ route('sellers.index') }}"
-    class="flex items-center gap-3 px-3 py-3 rounded-lg
-    {{ request()->routeIs('sellers.*') ? 'bg-indigo-600 text-white' : 'hover:bg-slate-800 transition' }}">
+            <a href="{{ route('sellers.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('sellers.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
-    <i data-lucide="user-round" class="w-5 h-5"></i>
+                <i data-lucide="user-round" class="w-5 h-5"></i>
 
-    <span>Sellers</span>
+                <span>Sellers</span>
 
-    <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
-        {{ \App\Models\Seller::count() }}
-    </span>
+                <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+                    {{ \App\Models\Seller::count() }}
+                </span>
 
-</a>
+            </a>
 
 
             <!-- Payments -->
 
             <a href="{{ route('payments.index') }}"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('payments.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
                 <i data-lucide="credit-card" class="w-5 h-5"></i>
 
                 <span>Payments</span>
 
-               <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
-        {{ \App\Models\Payment::count() }}
-    </span>
+                <span class="ml-auto bg-indigo-500 text-xs px-2 py-1 rounded-full">
+                    {{ \App\Models\Payment::count() }}
+                </span>
 
             </a>
 
 
-            <!-- Fulfillment -->
+            <!-- Shipping & Pickup -->
 
             <a href="{{ route('shipping-pickups.index') }}"
-    class="flex items-center gap-3 px-3 py-3 rounded-lg
-    {{ request()->routeIs('shipping-pickups.*')
-        ? 'bg-indigo-600 text-white'
-        : 'text-slate-300 hover:bg-slate-800' }}
-    transition">
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('shipping-pickups.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
-    <i data-lucide="truck" class="w-5 h-5"></i>
+                <i data-lucide="truck" class="w-5 h-5"></i>
 
-    <span>Shipping & Pickup</span>
-</a>
+                <span>Shipping & Pickup</span>
+
+            </a>
 
 
             <!-- Reports -->
 
-           <a href="{{ route('reports.index') }}"
-   class="flex items-center gap-3 px-3 py-3 rounded-lg text-white">
+            <a href="{{ route('reports.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                {{ request()->routeIs('reports.*')
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800' }}
+                transition">
 
-    <svg class="w-5 h-5"
-         fill="none"
-         stroke="currentColor"
-         viewBox="0 0 24 24">
+                <i data-lucide="file-bar-chart" class="w-5 h-5"></i>
 
-        <path stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a2 2 0 011.414.586l4.414 4.414A2 2 0 0119 9v10a2 2 0 01-2 2z" />
+                <span>Reports</span>
 
-    </svg>
-
-    Reports
-
-</a>
+            </a>
 
 
             <div class="border-t border-slate-800 my-4"></div>
@@ -251,8 +286,9 @@
 
             <!-- Users -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('users.index') }}"
+                class="flex items-center gap-3 px-3 py-3 
+                text-slate-300">
 
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
 
@@ -263,8 +299,9 @@
 
             <!-- Notifications -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('notifications.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                text-slate-300 hover:bg-slate-800 transition">
 
                 <i data-lucide="bell" class="w-5 h-5"></i>
 
@@ -275,8 +312,9 @@
 
             <!-- Settings -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('settings.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                text-slate-300 hover:bg-slate-800 transition">
 
                 <i data-lucide="settings" class="w-5 h-5"></i>
 
@@ -285,10 +323,11 @@
             </a>
 
 
-            <!-- Audit -->
+            <!-- Audit Logs -->
 
-            <a href="#"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+            <a href="{{ route('audit-logs.index') }}"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg
+                text-slate-300 hover:bg-slate-800 transition">
 
                 <i data-lucide="file-clock" class="w-5 h-5"></i>
 
@@ -296,29 +335,52 @@
 
             </a>
 
+            <form action="{{ route('logout') }}" method="POST">
+    @csrf
+
+    <button
+        type="submit"
+        class="flex items-center gap-2 w-full px-4 py-3
+               text-sm text-red-600
+               hover:bg-red-50 rounded-lg">
+
+        <i data-lucide="log-out" class="w-5 h-5"></i>
+
+        Logout
+
+    </button>
+
+</form>
+
         </nav>
 
     </aside>
 
 
-    <!-- ================================= -->
+    <!-- ===================================================== -->
     <!-- MAIN CONTENT -->
-    <!-- ================================= -->
+    <!-- ===================================================== -->
 
     <div class="flex-1 lg:ml-64">
 
 
-        <!-- ================================= -->
+        <!-- ================================================= -->
         <!-- TOP NAVBAR -->
-        <!-- ================================= -->
+        <!-- ================================================= -->
 
-        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-40">
+        <header
+            class="h-20 bg-white border-b border-gray-200
+            flex items-center justify-between
+            px-4 sm:px-6 lg:px-8
+            sticky top-0 z-40">
 
             <div class="flex items-center gap-4">
 
+
                 <!-- Mobile Menu -->
 
-                <button onclick="toggleSidebar()"
+                <button
+                    onclick="toggleSidebar()"
                     class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
 
                     <i data-lucide="menu" class="w-6 h-6"></i>
@@ -328,34 +390,43 @@
 
                 <!-- Search -->
 
-                <div class="hidden sm:flex items-center bg-gray-100 rounded-xl px-4 py-2.5 w-64 lg:w-96">
+                <div
+                    class="hidden sm:flex items-center bg-gray-100
+                    rounded-xl px-4 py-2.5
+                    w-64 lg:w-96">
 
                     <i data-lucide="search"
                         class="w-5 h-5 text-gray-400 mr-2">
                     </i>
 
-                 <form action="{{ route('dashboard') }}" method="GET">
+                    <form
+                        action="{{ route('dashboard') }}"
+                        method="GET"
+                        class="w-full">
 
-<input
-type="text"
-name="search"
-value="{{ request('search') }}"
-placeholder="Search auctions..."
-class="bg-transparent outline-none w-full text-sm">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Search auctions..."
+                            class="bg-transparent outline-none w-full text-sm">
 
-</form>
+                    </form>
 
                 </div>
 
             </div>
 
 
+            <!-- Right Navbar -->
+
             <div class="flex items-center gap-3">
 
 
-                <!-- Search Mobile -->
+                <!-- Mobile Search -->
 
-                <button class="sm:hidden p-2 hover:bg-gray-100 rounded-lg">
+                <button
+                    class="sm:hidden p-2 hover:bg-gray-100 rounded-lg">
 
                     <i data-lucide="search"
                         class="w-5 h-5">
@@ -366,13 +437,16 @@ class="bg-transparent outline-none w-full text-sm">
 
                 <!-- Notification -->
 
-                <button class="relative p-2 hover:bg-gray-100 rounded-lg">
+                <button
+                    class="relative p-2 hover:bg-gray-100 rounded-lg">
 
                     <i data-lucide="bell"
                         class="w-5 h-5">
                     </i>
 
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full">
+                    <span
+                        class="absolute top-1 right-1
+                        w-2 h-2 bg-red-500 rounded-full">
                     </span>
 
                 </button>
@@ -380,10 +454,18 @@ class="bg-transparent outline-none w-full text-sm">
 
                 <!-- Profile -->
 
-                <div class="flex items-center gap-3 border-l pl-4">
+                <div
+                    class="flex items-center gap-3
+                    border-l pl-4">
 
-                    <div class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold">
+                    <div
+                        class="w-10 h-10 bg-indigo-600
+                        text-white rounded-full
+                        flex items-center justify-center
+                        font-bold">
+
                         AD
+
                     </div>
 
                     <div class="hidden md:block">
@@ -409,25 +491,37 @@ class="bg-transparent outline-none w-full text-sm">
         </header>
 
 
-        <!-- ================================= -->
+        <!-- ================================================= -->
         <!-- PAGE CONTENT -->
-        <!-- ================================= -->
+        <!-- ================================================= -->
 
         <main class="p-4 sm:p-6 lg:p-8">
 
 
+            <!-- ================================================= -->
             <!-- PAGE HEADER -->
+            <!-- ================================================= -->
 
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+            <div
+                class="flex flex-col md:flex-row
+                md:items-center md:justify-between
+                gap-4 mb-8">
 
                 <div>
 
-                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                    <h2
+                        class="text-2xl sm:text-3xl
+                        font-bold text-gray-900">
+
                         Dashboard
+
                     </h2>
 
                     <p class="text-gray-500 mt-1">
-                        Welcome back! Here's what's happening with your auctions.
+
+                        Welcome back! Here's what's happening
+                        with your auctions.
+
                     </p>
 
                 </div>
@@ -435,30 +529,47 @@ class="bg-transparent outline-none w-full text-sm">
 
                 <div class="flex gap-3">
 
+                    <a
+                        href="{{ route('auctions.create') }}"
+                        class="flex items-center gap-2
+                        px-4 py-2.5
+                        bg-indigo-600 text-white
+                        rounded-xl hover:bg-indigo-700
+                        transition">
 
-                    <a href="{{ route('auctions.create') }}"
-   class="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
-    <i data-lucide="plus" class="w-4 h-4"></i>
-    Create Auction
-</a>
+                        <i data-lucide="plus"
+                            class="w-4 h-4">
+                        </i>
+
+                        Create Auction
+
+                    </a>
 
                 </div>
 
             </div>
 
 
-            <!-- ================================= -->
-            <!-- STATISTICS CARDS -->
-            <!-- ================================= -->
+            <!-- ================================================= -->
+            <!-- MAIN STATISTICS -->
+            <!-- ================================================= -->
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+            <div
+                class="grid grid-cols-1
+                sm:grid-cols-2
+                xl:grid-cols-4
+                gap-5 mb-8">
 
 
                 <!-- Total Auctions -->
 
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div
+                    class="bg-white rounded-2xl p-5
+                    border border-gray-100 shadow-sm">
 
-                    <div class="flex justify-between items-start">
+                    <div
+                        class="flex justify-between
+                        items-start">
 
                         <div>
 
@@ -466,24 +577,33 @@ class="bg-transparent outline-none w-full text-sm">
                                 Total Auctions
                             </p>
 
-                            <h3 class="text-3xl font-bold mt-2">
-                               {{ $totalAuctions }}
-                          </h3>
+                            <h3
+                                class="text-3xl font-bold mt-2">
 
-                            <p class="text-sm text-green-600 mt-2 flex items-center gap-1">
+                                {{ $totalAuctions }}
+
+                            </h3>
+
+                            <p
+                                class="text-sm text-green-600
+                                mt-2 flex items-center gap-1">
 
                                 <i data-lucide="trending-up"
                                     class="w-4 h-4">
                                 </i>
 
-                                12.5% this month
+                                {{ $auctionsThisMonth }} this month
 
                             </p>
 
                         </div>
 
-
-                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-12 h-12
+                            bg-indigo-100
+                            text-indigo-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="gavel"
                                 class="w-6 h-6">
@@ -498,9 +618,13 @@ class="bg-transparent outline-none w-full text-sm">
 
                 <!-- Total Lots -->
 
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div
+                    class="bg-white rounded-2xl p-5
+                    border border-gray-100 shadow-sm">
 
-                    <div class="flex justify-between items-start">
+                    <div
+                        class="flex justify-between
+                        items-start">
 
                         <div>
 
@@ -508,18 +632,28 @@ class="bg-transparent outline-none w-full text-sm">
                                 Total Lots
                             </p>
 
-                            <h3 class="text-3xl font-bold mt-2">
+                            <h3
+                                class="text-3xl font-bold mt-2">
+
                                 {{ $totalLots }}
+
                             </h3>
 
-                            <p class="text-sm text-green-600 mt-2">
-                                +842 this month
+                            <p
+                                class="text-sm text-green-600 mt-2">
+
+                                +{{ $lotsThisMonth }} this month
+
                             </p>
 
                         </div>
 
-
-                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-12 h-12
+                            bg-blue-100
+                            text-blue-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="package"
                                 class="w-6 h-6">
@@ -534,9 +668,13 @@ class="bg-transparent outline-none w-full text-sm">
 
                 <!-- Total Bids -->
 
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div
+                    class="bg-white rounded-2xl p-5
+                    border border-gray-100 shadow-sm">
 
-                    <div class="flex justify-between items-start">
+                    <div
+                        class="flex justify-between
+                        items-start">
 
                         <div>
 
@@ -544,18 +682,28 @@ class="bg-transparent outline-none w-full text-sm">
                                 Total Bids
                             </p>
 
-                            <h3 class="text-3xl font-bold mt-2">
+                            <h3
+                                class="text-3xl font-bold mt-2">
+
                                 {{ $totalBids }}
+
                             </h3>
 
-                            <p class="text-sm text-green-600 mt-2">
-                                +18.2% this week
+                            <p
+                                class="text-sm text-green-600 mt-2">
+
+                                +{{ $bidsThisWeek }} this week
+
                             </p>
 
                         </div>
 
-
-                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-12 h-12
+                            bg-purple-100
+                            text-purple-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="radio"
                                 class="w-6 h-6">
@@ -568,11 +716,15 @@ class="bg-transparent outline-none w-full text-sm">
                 </div>
 
 
-                <!-- Revenue -->
+                <!-- Total Sales -->
 
-                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div
+                    class="bg-white rounded-2xl p-5
+                    border border-gray-100 shadow-sm">
 
-                    <div class="flex justify-between items-start">
+                    <div
+                        class="flex justify-between
+                        items-start">
 
                         <div>
 
@@ -580,18 +732,28 @@ class="bg-transparent outline-none w-full text-sm">
                                 Total Sales
                             </p>
 
-                            <h3 class="text-3xl font-bold mt-2">
+                            <h3
+                                class="text-3xl font-bold mt-2">
+
                                 £{{ number_format($totalSales, 2) }}
+
                             </h3>
 
-                            <p class="text-sm text-green-600 mt-2">
-                                +15.4% this month
+                            <p
+                                class="text-sm text-green-600 mt-2">
+
+                                Paid sales
+
                             </p>
 
                         </div>
 
-
-                        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-12 h-12
+                            bg-green-100
+                            text-green-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="pound-sterling"
                                 class="w-6 h-6">
@@ -606,18 +768,31 @@ class="bg-transparent outline-none w-full text-sm">
             </div>
 
 
-            <!-- ================================= -->
+            <!-- ================================================= -->
             <!-- SECONDARY STATISTICS -->
-            <!-- ================================= -->
+            <!-- ================================================= -->
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div
+                class="grid grid-cols-1
+                sm:grid-cols-2
+                lg:grid-cols-4
+                gap-5 mb-8">
 
 
-                <div class="bg-white p-5 rounded-2xl border border-gray-100">
+                <!-- Registered Bidders -->
+
+                <div
+                    class="bg-white p-5 rounded-2xl
+                    border border-gray-100">
 
                     <div class="flex items-center gap-4">
 
-                        <div class="w-11 h-11 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-11 h-11
+                            bg-orange-100
+                            text-orange-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="users"
                                 class="w-5 h-5">
@@ -642,11 +817,20 @@ class="bg-transparent outline-none w-full text-sm">
                 </div>
 
 
-                <div class="bg-white p-5 rounded-2xl border border-gray-100">
+                <!-- Sold Lots -->
+
+                <div
+                    class="bg-white p-5 rounded-2xl
+                    border border-gray-100">
 
                     <div class="flex items-center gap-4">
 
-                        <div class="w-11 h-11 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-11 h-11
+                            bg-green-100
+                            text-green-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="check-circle"
                                 class="w-5 h-5">
@@ -671,11 +855,20 @@ class="bg-transparent outline-none w-full text-sm">
                 </div>
 
 
-                <div class="bg-white p-5 rounded-2xl border border-gray-100">
+                <!-- Pending Payments -->
+
+                <div
+                    class="bg-white p-5 rounded-2xl
+                    border border-gray-100">
 
                     <div class="flex items-center gap-4">
 
-                        <div class="w-11 h-11 bg-red-100 text-red-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-11 h-11
+                            bg-red-100
+                            text-red-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="clock"
                                 class="w-5 h-5">
@@ -700,11 +893,20 @@ class="bg-transparent outline-none w-full text-sm">
                 </div>
 
 
-                <div class="bg-white p-5 rounded-2xl border border-gray-100">
+                <!-- Missing Images -->
+
+                <div
+                    class="bg-white p-5 rounded-2xl
+                    border border-gray-100">
 
                     <div class="flex items-center gap-4">
 
-                        <div class="w-11 h-11 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center">
+                        <div
+                            class="w-11 h-11
+                            bg-yellow-100
+                            text-yellow-600
+                            rounded-xl
+                            flex items-center justify-center">
 
                             <i data-lucide="image-off"
                                 class="w-5 h-5">
@@ -731,18 +933,26 @@ class="bg-transparent outline-none w-full text-sm">
             </div>
 
 
-            <!-- ================================= -->
-            <!-- CHART + AUCTION STATUS -->
-            <!-- ================================= -->
+            <!-- ================================================= -->
+            <!-- SALES CHART + AUCTION STATUS -->
+            <!-- ================================================= -->
 
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+            <div
+                class="grid grid-cols-1
+                xl:grid-cols-3
+                gap-6 mb-8">
 
 
                 <!-- SALES CHART -->
 
-                <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+                <div
+                    class="xl:col-span-2
+                    bg-white rounded-2xl
+                    border border-gray-100 p-6">
 
-                    <div class="flex justify-between items-center mb-6">
+                    <div
+                        class="flex justify-between
+                        items-center mb-6">
 
                         <div>
 
@@ -756,19 +966,26 @@ class="bg-transparent outline-none w-full text-sm">
 
                         </div>
 
+                        <select
+                            class="border border-gray-200
+                            rounded-lg px-3 py-2
+                            text-sm outline-none">
 
-                        <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none">
+                            <option>
+                                Last 7 Days
+                            </option>
 
-                            <option>Last 7 Days</option>
+                            <option>
+                                Last 30 Days
+                            </option>
 
-                            <option>Last 30 Days</option>
-
-                            <option>Last 6 Months</option>
+                            <option>
+                                Last 6 Months
+                            </option>
 
                         </select>
 
                     </div>
-
 
                     <div class="h-72">
 
@@ -781,7 +998,9 @@ class="bg-transparent outline-none w-full text-sm">
 
                 <!-- AUCTION STATUS -->
 
-                <div class="bg-white rounded-2xl border border-gray-100 p-6">
+                <div
+                    class="bg-white rounded-2xl
+                    border border-gray-100 p-6">
 
                     <h3 class="text-lg font-bold">
                         Auction Status
@@ -799,11 +1018,17 @@ class="bg-transparent outline-none w-full text-sm">
 
                         <div>
 
-                            <div class="flex justify-between mb-2">
+                            <div
+                                class="flex justify-between mb-2">
 
-                                <span class="flex items-center gap-2 text-sm">
+                                <span
+                                    class="flex items-center gap-2 text-sm">
 
-                                    <span class="w-3 h-3 bg-red-500 rounded-full animate-pulse">
+                                    <span
+                                        class="w-3 h-3
+                                        bg-red-500
+                                        rounded-full
+                                        animate-pulse">
                                     </span>
 
                                     Live Auctions
@@ -811,15 +1036,22 @@ class="bg-transparent outline-none w-full text-sm">
                                 </span>
 
                                 <span class="font-bold">
+
                                     {{ $auctionStatus['live'] }}
+
                                 </span>
 
                             </div>
 
-                            <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div
+                                class="w-full bg-gray-100
+                                rounded-full h-2">
 
-                                <div class="bg-red-500 h-2 rounded-full"
-                                    style="width: 25%">
+                                <div
+                                    class="bg-red-500
+                                    h-2 rounded-full
+                                    transition-all"
+                                    style="width: {{ $auctionStatusPercentages['live'] }}%">
                                 </div>
 
                             </div>
@@ -831,11 +1063,16 @@ class="bg-transparent outline-none w-full text-sm">
 
                         <div>
 
-                            <div class="flex justify-between mb-2">
+                            <div
+                                class="flex justify-between mb-2">
 
-                                <span class="flex items-center gap-2 text-sm">
+                                <span
+                                    class="flex items-center gap-2 text-sm">
 
-                                    <span class="w-3 h-3 bg-yellow-500 rounded-full">
+                                    <span
+                                        class="w-3 h-3
+                                        bg-yellow-500
+                                        rounded-full">
                                     </span>
 
                                     Upcoming
@@ -843,15 +1080,22 @@ class="bg-transparent outline-none w-full text-sm">
                                 </span>
 
                                 <span class="font-bold">
+
                                     {{ $auctionStatus['upcoming'] }}
+
                                 </span>
 
                             </div>
 
-                            <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div
+                                class="w-full bg-gray-100
+                                rounded-full h-2">
 
-                                <div class="bg-yellow-500 h-2 rounded-full"
-                                    style="width: 40%">
+                                <div
+                                    class="bg-yellow-500
+                                    h-2 rounded-full
+                                    transition-all"
+                                    style="width: {{ $auctionStatusPercentages['upcoming'] }}%">
                                 </div>
 
                             </div>
@@ -863,11 +1107,16 @@ class="bg-transparent outline-none w-full text-sm">
 
                         <div>
 
-                            <div class="flex justify-between mb-2">
+                            <div
+                                class="flex justify-between mb-2">
 
-                                <span class="flex items-center gap-2 text-sm">
+                                <span
+                                    class="flex items-center gap-2 text-sm">
 
-                                    <span class="w-3 h-3 bg-green-500 rounded-full">
+                                    <span
+                                        class="w-3 h-3
+                                        bg-green-500
+                                        rounded-full">
                                     </span>
 
                                     Completed
@@ -875,15 +1124,22 @@ class="bg-transparent outline-none w-full text-sm">
                                 </span>
 
                                 <span class="font-bold">
+
                                     {{ $auctionStatus['completed'] }}
+
                                 </span>
 
                             </div>
 
-                            <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div
+                                class="w-full bg-gray-100
+                                rounded-full h-2">
 
-                                <div class="bg-green-500 h-2 rounded-full"
-                                    style="width: 75%">
+                                <div
+                                    class="bg-green-500
+                                    h-2 rounded-full
+                                    transition-all"
+                                    style="width: {{ $auctionStatusPercentages['completed'] }}%">
                                 </div>
 
                             </div>
@@ -895,11 +1151,16 @@ class="bg-transparent outline-none w-full text-sm">
 
                         <div>
 
-                            <div class="flex justify-between mb-2">
+                            <div
+                                class="flex justify-between mb-2">
 
-                                <span class="flex items-center gap-2 text-sm">
+                                <span
+                                    class="flex items-center gap-2 text-sm">
 
-                                    <span class="w-3 h-3 bg-gray-400 rounded-full">
+                                    <span
+                                        class="w-3 h-3
+                                        bg-gray-400
+                                        rounded-full">
                                     </span>
 
                                     Drafts
@@ -907,15 +1168,22 @@ class="bg-transparent outline-none w-full text-sm">
                                 </span>
 
                                 <span class="font-bold">
+
                                     {{ $auctionStatus['draft'] }}
+
                                 </span>
 
                             </div>
 
-                            <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div
+                                class="w-full bg-gray-100
+                                rounded-full h-2">
 
-                                <div class="bg-gray-400 h-2 rounded-full"
-                                    style="width: 15%">
+                                <div
+                                    class="bg-gray-400
+                                    h-2 rounded-full
+                                    transition-all"
+                                    style="width: {{ $auctionStatusPercentages['draft'] }}%">
                                 </div>
 
                             </div>
@@ -929,14 +1197,22 @@ class="bg-transparent outline-none w-full text-sm">
             </div>
 
 
-            <!-- ================================= -->
+            <!-- ================================================= -->
             <!-- LIVE AUCTIONS -->
-            <!-- ================================= -->
+            <!-- ================================================= -->
 
-            <div class="bg-white rounded-2xl border border-gray-100 mb-8">
+            <div
+                class="bg-white rounded-2xl
+                border border-gray-100 mb-8">
 
 
-                <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <!-- Header -->
+
+                <div
+                    class="p-6 border-b border-gray-100
+                    flex flex-col sm:flex-row
+                    sm:items-center
+                    justify-between gap-4">
 
                     <div>
 
@@ -951,12 +1227,20 @@ class="bg-transparent outline-none w-full text-sm">
                     </div>
 
 
-                    <a href="{{ route('auctions.index') }}"
-   class="text-indigo-600 text-sm font-medium hover:text-indigo-800">
-    View All Auctions →
-</a>
+                    <a
+                        href="{{ route('auctions.index') }}"
+                        class="text-indigo-600
+                        text-sm font-medium
+                        hover:text-indigo-800">
+
+                        View All Auctions →
+
+                    </a>
+
                 </div>
 
+
+                <!-- Table -->
 
                 <div class="overflow-x-auto">
 
@@ -966,28 +1250,58 @@ class="bg-transparent outline-none w-full text-sm">
 
                             <tr>
 
-                                <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                                <th
+                                    class="text-left px-6 py-4
+                                    text-xs font-semibold
+                                    text-gray-500 uppercase">
+
                                     Auction
+
                                 </th>
 
-                                <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                                <th
+                                    class="text-left px-6 py-4
+                                    text-xs font-semibold
+                                    text-gray-500 uppercase">
+
                                     Lots
+
                                 </th>
 
-                                <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                                <th
+                                    class="text-left px-6 py-4
+                                    text-xs font-semibold
+                                    text-gray-500 uppercase">
+
                                     Bids
+
                                 </th>
 
-                                <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                                <th
+                                    class="text-left px-6 py-4
+                                    text-xs font-semibold
+                                    text-gray-500 uppercase">
+
                                     Sales
+
                                 </th>
 
-                                <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                                <th
+                                    class="text-left px-6 py-4
+                                    text-xs font-semibold
+                                    text-gray-500 uppercase">
+
                                     Status
+
                                 </th>
 
-                                <th class="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase">
+                                <th
+                                    class="text-right px-6 py-4
+                                    text-xs font-semibold
+                                    text-gray-500 uppercase">
+
                                     Action
+
                                 </th>
 
                             </tr>
@@ -995,109 +1309,203 @@ class="bg-transparent outline-none w-full text-sm">
                         </thead>
 
 
-                       <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y divide-gray-100">
 
-    @forelse($liveAuctions as $auction)
 
-        <tr class="hover:bg-gray-50">
+                            @forelse($liveAuctions as $auction)
 
-            <td class="px-6 py-4">
+                                <tr class="hover:bg-gray-50">
 
-                <div class="flex items-center gap-3">
 
-                    <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                    <!-- Auction -->
 
-                        <i data-lucide="gavel"
-                           class="w-5 h-5 text-indigo-600">
-                        </i>
+                                    <td class="px-6 py-4">
 
-                    </div>
+                                        <div
+                                            class="flex items-center gap-3">
 
-                    <div>
+                                            <div
+                                                class="w-10 h-10
+                                                bg-indigo-100
+                                                rounded-lg
+                                                flex items-center
+                                                justify-center">
 
-                        <p class="font-semibold">
-                            {{ $auction->name }}
-                        </p>
+                                                <i
+                                                    data-lucide="gavel"
+                                                    class="w-5 h-5
+                                                    text-indigo-600">
+                                                </i>
 
-                        <p class="text-xs text-gray-500">
+                                            </div>
 
-                            @if($auction->end_at)
-                                Ends {{ $auction->end_at->diffForHumans() }}
-                            @else
-                                No end date
-                            @endif
 
-                        </p>
+                                            <div>
 
-                    </div>
+                                                <p
+                                                    class="font-semibold">
 
-                </div>
+                                                    {{ $auction->name }}
 
-            </td>
+                                                </p>
 
-            <td class="px-6 py-4">
-                {{ $auction->lots_count }}
-            </td>
+                                                <p
+                                                    class="text-xs
+                                                    text-gray-500">
 
-            <td class="px-6 py-4">
+                                                    @if($auction->end_at)
 
-                {{ $auction->lots->sum(function ($lot) {
-                    return $lot->bids->count();
-                }) }}
+                                                        Ends
+                                                        {{ $auction->end_at->diffForHumans() }}
 
-            </td>
+                                                    @else
 
-            <td class="px-6 py-4 font-semibold">
+                                                        No end date
 
-                £{{ number_format($auction->total_sales, 2) }}
+                                                    @endif
 
-            </td>
+                                                </p>
 
-            <td class="px-6 py-4">
+                                            </div>
 
-                <span class="inline-flex items-center gap-2 px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
+                                        </div>
 
-                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse">
-                    </span>
+                                    </td>
 
-                    Live
 
-                </span>
+                                    <!-- Lots -->
 
-            </td>
+                                    <td class="px-6 py-4">
 
-            <td class="px-6 py-4 text-right">
+                                        {{ $auction->lots_count }}
 
-                <a href="{{ route('auctions.show',$auction->id) }}">
-                <a href="{{ route('auctions.edit',$auction->id) }}">
-                   
+                                    </td>
 
-                    <i data-lucide="more-horizontal"
-                       class="w-5 h-5">
-                    </i>
 
-                </a>
+                                    <!-- Bids -->
 
-            </td>
+                                    <td class="px-6 py-4">
 
-        </tr>
+                                        {{ $auction->lots->sum(function ($lot) {
+                                            return $lot->bids->count();
+                                        }) }}
 
-    @empty
+                                    </td>
 
-        <tr>
 
-            <td colspan="6"
-                class="px-6 py-10 text-center text-gray-500">
+                                    <!-- Sales -->
 
-                No live auctions found.
+                                    <td
+                                        class="px-6 py-4
+                                        font-semibold">
 
-            </td>
+                                        £{{ number_format($auction->total_sales, 2) }}
 
-        </tr>
+                                    </td>
 
-    @endforelse
 
-</tbody>
+                                    <!-- Status -->
+
+                                    <td class="px-6 py-4">
+
+                                        <span
+                                            class="inline-flex
+                                            items-center gap-2
+                                            px-3 py-1
+                                            bg-red-50
+                                            text-red-600
+                                            rounded-full
+                                            text-xs font-medium">
+
+                                            <span
+                                                class="w-2 h-2
+                                                bg-red-500
+                                                rounded-full
+                                                animate-pulse">
+                                            </span>
+
+                                            Live
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Actions -->
+
+                                    <td
+                                        class="px-6 py-4
+                                        text-right">
+
+                                        <div
+                                            class="flex
+                                            items-center
+                                            justify-end gap-2">
+
+
+                                            <!-- View -->
+
+                                            <a
+                                                href="{{ route('auctions.show', $auction->id) }}"
+                                                class="p-2 rounded-lg
+                                                text-gray-500
+                                                hover:text-indigo-600
+                                                hover:bg-indigo-50
+                                                transition"
+                                                title="View Auction">
+
+                                                <i
+                                                    data-lucide="eye"
+                                                    class="w-5 h-5">
+                                                </i>
+
+                                            </a>
+
+
+                                            <!-- Edit -->
+
+                                            <a
+                                                href="{{ route('auctions.edit', $auction->id) }}"
+                                                class="p-2 rounded-lg
+                                                text-gray-500
+                                                hover:text-indigo-600
+                                                hover:bg-gray-100
+                                                transition"
+                                                title="Edit Auction">
+
+                                                <i
+                                                    data-lucide="edit"
+                                                    class="w-5 h-5">
+                                                </i>
+
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+
+                            @empty
+
+                                <tr>
+
+                                    <td
+                                        colspan="6"
+                                        class="px-6 py-10
+                                        text-center
+                                        text-gray-500">
+
+                                        No live auctions found.
+
+                                    </td>
+
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
 
                     </table>
 
@@ -1106,18 +1514,28 @@ class="bg-transparent outline-none w-full text-sm">
             </div>
 
 
-            <!-- ================================= -->
+            <!-- ================================================= -->
             <!-- BOTTOM SECTION -->
-            <!-- ================================= -->
+            <!-- ================================================= -->
 
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div
+                class="grid grid-cols-1
+                xl:grid-cols-2
+                gap-6">
 
 
+                <!-- ================================================= -->
                 <!-- RECENT ACTIVITY -->
+                <!-- ================================================= -->
 
-                <div class="bg-white rounded-2xl border border-gray-100">
+                <div
+                    class="bg-white rounded-2xl
+                    border border-gray-100">
 
-                    <div class="p-6 border-b border-gray-100">
+
+                    <div
+                        class="p-6 border-b
+                        border-gray-100">
 
                         <h3 class="text-lg font-bold">
                             Recent Activity
@@ -1133,110 +1551,419 @@ class="bg-transparent outline-none w-full text-sm">
                     <div class="p-6 space-y-6">
 
 
-                        <div class="flex gap-4">
+                        <!-- Recent Imports -->
 
-                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                        @foreach($recentImports as $import)
 
-                                <i data-lucide="upload"
-                                    class="w-5 h-5">
+                            <div
+                                class="flex gap-4">
+
+                                <div
+                                    class="w-10 h-10
+                                    bg-blue-100
+                                    text-blue-600
+                                    rounded-full
+                                    flex items-center
+                                    justify-center
+                                    shrink-0">
+
+                                    <i
+                                        data-lucide="upload"
+                                        class="w-5 h-5">
+                                    </i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="text-sm
+                                        font-medium">
+
+                                        Bulk import completed
+
+                                    </p>
+
+                                    <p
+                                        class="text-xs
+                                        text-gray-500 mt-1">
+
+                                        {{ $import->created_at->diffForHumans() }}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+
+                        <!-- Recent Bids -->
+
+                        @foreach($recentBids as $bid)
+
+                            <div
+                                class="flex gap-4">
+
+                                <div
+                                    class="w-10 h-10
+                                    bg-green-100
+                                    text-green-600
+                                    rounded-full
+                                    flex items-center
+                                    justify-center
+                                    shrink-0">
+
+                                    <i
+                                        data-lucide="gavel"
+                                        class="w-5 h-5">
+                                    </i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="text-sm
+                                        font-medium">
+
+                                        New bid placed
+
+                                    </p>
+
+                                    <p
+                                        class="text-xs
+                                        text-gray-500 mt-1">
+
+                                        @if($bid->lot)
+
+                                            Lot #{{ $bid->lot->lot_number }}
+
+                                        @else
+
+                                            Auction lot
+
+                                        @endif
+
+                                        · £{{ number_format($bid->amount ?? 0, 2) }}
+
+                                        · {{ $bid->created_at->diffForHumans() }}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+
+                        <!-- Recent Bidders -->
+
+                        @foreach($recentBidders as $bidder)
+
+                            <div
+                                class="flex gap-4">
+
+                                <div
+                                    class="w-10 h-10
+                                    bg-orange-100
+                                    text-orange-600
+                                    rounded-full
+                                    flex items-center
+                                    justify-center
+                                    shrink-0">
+
+                                    <i
+                                        data-lucide="user-plus"
+                                        class="w-5 h-5">
+                                    </i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="text-sm
+                                        font-medium">
+
+                                        New bidder registration
+
+                                    </p>
+
+                                    <p
+                                        class="text-xs
+                                        text-gray-500 mt-1">
+
+                                        {{ $bidder->name ?? 'New bidder' }}
+
+                                        · {{ $bidder->created_at->diffForHumans() }}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+
+                        <!-- Empty State -->
+
+                        @if(
+                            $recentImports->isEmpty() &&
+                            $recentBids->isEmpty() &&
+                            $recentBidders->isEmpty()
+                        )
+
+                            <div
+                                class="text-center py-8">
+
+                                <i
+                                    data-lucide="activity"
+                                    class="w-8 h-8 mx-auto
+                                    text-gray-300">
                                 </i>
 
-                            </div>
+                                <p
+                                    class="text-sm
+                                    text-gray-500 mt-2">
 
-                            <div>
+                                    No recent activity.
 
-                                <p class="text-sm font-medium">
-                                    120 lots imported successfully
-                                </p>
-
-                                <p class="text-xs text-gray-500 mt-1">
-                                    Antique Collection · 10 minutes ago
                                 </p>
 
                             </div>
 
-                        </div>
-
-
-                        <div class="flex gap-4">
-
-                            <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
-
-                                <i data-lucide="gavel"
-                                    class="w-5 h-5">
-                                </i>
-
-                            </div>
-
-                            <div>
-
-                                <p class="text-sm font-medium">
-                                    New bid placed on Lot #LOT-1001
-                                </p>
-
-                                <p class="text-xs text-gray-500 mt-1">
-                                    Current bid £2,500 · 15 minutes ago
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="flex gap-4">
-
-                            <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
-
-                                <i data-lucide="images"
-                                    class="w-5 h-5">
-                                </i>
-
-                            </div>
-
-                            <div>
-
-                                <p class="text-sm font-medium">
-                                    340 images matched automatically
-                                </p>
-
-                                <p class="text-xs text-gray-500 mt-1">
-                                    Fine Art Collection · 25 minutes ago
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="flex gap-4">
-
-                            <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center">
-
-                                <i data-lucide="user-plus"
-                                    class="w-5 h-5">
-                                </i>
-
-                            </div>
-
-                            <div>
-
-                                <p class="text-sm font-medium">
-                                    New bidder registration
-                                </p>
-
-                                <p class="text-xs text-gray-500 mt-1">
-                                    Bidder #BD-2045 · 1 hour ago
-                                </p>
-
-                            </div>
-
-                        </div>
+                        @endif
 
                     </div>
 
                 </div>
 
 
+                <!-- ================================================= -->
+                <!-- QUICK ACTIONS -->
+                <!-- ================================================= -->
+
+                <div
+                    class="bg-white rounded-2xl
+                    border border-gray-100">
+
+
+                    <div
+                        class="p-6 border-b
+                        border-gray-100">
+
+                        <h3 class="text-lg font-bold">
+                            Quick Actions
+                        </h3>
+
+                        <p class="text-sm text-gray-500">
+                            Manage your auction system
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="p-6 grid
+                        grid-cols-1 sm:grid-cols-2
+                        gap-4">
+
+
+                        <!-- Create Auction -->
+
+                        <a
+                            href="{{ route('auctions.create') }}"
+                            class="flex items-center gap-4
+                            p-4 rounded-xl
+                            border border-gray-100
+                            hover:border-indigo-200
+                            hover:bg-indigo-50
+                            transition">
+
+                            <div
+                                class="w-11 h-11
+                                bg-indigo-100
+                                text-indigo-600
+                                rounded-xl
+                                flex items-center
+                                justify-center">
+
+                                <i
+                                    data-lucide="plus"
+                                    class="w-5 h-5">
+                                </i>
+
+                            </div>
+
+                            <div>
+
+                                <p
+                                    class="font-semibold">
+
+                                    Create Auction
+
+                                </p>
+
+                                <p
+                                    class="text-xs
+                                    text-gray-500">
+
+                                    Add new auction
+
+                                </p>
+
+                            </div>
+
+                        </a>
+
+
+                        <!-- Auctions -->
+
+                        <a
+                            href="{{ route('auctions.index') }}"
+                            class="flex items-center gap-4
+                            p-4 rounded-xl
+                            border border-gray-100
+                            hover:border-indigo-200
+                            hover:bg-indigo-50
+                            transition">
+
+                            <div
+                                class="w-11 h-11
+                                bg-blue-100
+                                text-blue-600
+                                rounded-xl
+                                flex items-center
+                                justify-center">
+
+                                <i
+                                    data-lucide="gavel"
+                                    class="w-5 h-5">
+                                </i>
+
+                            </div>
+
+                            <div>
+
+                                <p class="font-semibold">
+                                    Auctions
+                                </p>
+
+                                <p
+                                    class="text-xs
+                                    text-gray-500">
+
+                                    Manage auctions
+
+                                </p>
+
+                            </div>
+
+                        </a>
+
+
+                        <!-- Lots -->
+
+                        <a
+                            href="{{ route('lots.index') }}"
+                            class="flex items-center gap-4
+                            p-4 rounded-xl
+                            border border-gray-100
+                            hover:border-indigo-200
+                            hover:bg-indigo-50
+                            transition">
+
+                            <div
+                                class="w-11 h-11
+                                bg-purple-100
+                                text-purple-600
+                                rounded-xl
+                                flex items-center
+                                justify-center">
+
+                                <i
+                                    data-lucide="package"
+                                    class="w-5 h-5">
+                                </i>
+
+                            </div>
+
+                            <div>
+
+                                <p class="font-semibold">
+                                    Lots
+                                </p>
+
+                                <p
+                                    class="text-xs
+                                    text-gray-500">
+
+                                    Manage auction lots
+
+                                </p>
+
+                            </div>
+
+                        </a>
+
+
+                        <!-- Bulk Import -->
+
+                        <a
+                            href="{{ route('bulk-imports.index') }}"
+                            class="flex items-center gap-4
+                            p-4 rounded-xl
+                            border border-gray-100
+                            hover:border-indigo-200
+                            hover:bg-indigo-50
+                            transition">
+
+                            <div
+                                class="w-11 h-11
+                                bg-green-100
+                                text-green-600
+                                rounded-xl
+                                flex items-center
+                                justify-center">
+
+                                <i
+                                    data-lucide="upload"
+                                    class="w-5 h-5">
+                                </i>
+
+                            </div>
+
+                            <div>
+
+                                <p class="font-semibold">
+                                    Bulk Import
+                                </p>
+
+                                <p
+                                    class="text-xs
+                                    text-gray-500">
+
+                                    Import lots from CSV
+
+                                </p>
+
+                            </div>
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </main>
 
@@ -1245,123 +1972,127 @@ class="bg-transparent outline-none w-full text-sm">
 </div>
 
 
-<!-- ================================= -->
+<!-- ===================================================== -->
 <!-- JAVASCRIPT -->
-<!-- ================================= -->
+<!-- ===================================================== -->
 
 <script>
 
-    // Initialize Icons
+    /*
+    |--------------------------------------------------------------------------
+    | LUCIDE ICONS
+    |--------------------------------------------------------------------------
+    */
 
     lucide.createIcons();
 
 
-    // Sidebar Toggle
+    /*
+    |--------------------------------------------------------------------------
+    | SIDEBAR
+    |--------------------------------------------------------------------------
+    */
 
     function toggleSidebar() {
 
         const sidebar =
             document.getElementById('sidebar');
 
-        sidebar.classList.toggle(
-            '-translate-x-full'
-        );
+        sidebar.classList.toggle('-translate-x-full');
 
     }
 
 
-    // Sales Chart
+    /*
+    |--------------------------------------------------------------------------
+    | SALES CHART
+    |--------------------------------------------------------------------------
+    */
 
-    const ctx =
-        document.getElementById(
-            'salesChart'
-        ).getContext('2d');
+    const salesCanvas =
+        document.getElementById('salesChart');
 
 
-    new Chart(ctx, {
+    if (salesCanvas) {
 
-        type: 'line',
+        const ctx =
+            salesCanvas.getContext('2d');
 
-        data: {
 
-            labels: [
-                'Mon',
-                'Tue',
-                'Wed',
-                'Thu',
-                'Fri',
-                'Sat',
-                'Sun'
-            ],
+        new Chart(ctx, {
 
-            datasets: [
+            type: 'line',
 
-                {
+            data: {
 
-                    label: 'Auction Sales',
+                labels: @json($salesChartLabels),
 
-                    data: [
-                        42000,
-                        58000,
-                        49000,
-                        75000,
-                        62000,
-                        91000,
-                        105000
-                    ],
+                datasets: [
 
-                    borderWidth: 3,
+                    {
 
-                    fill: true,
+                        label: 'Auction Sales',
 
-                    tension: 0.4
+                        data: @json($salesChartData),
 
-                }
+                        borderWidth: 3,
 
-            ]
+                        fill: true,
 
-        },
+                        tension: 0.4
 
-        options: {
+                    }
 
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            plugins: {
-
-                legend: {
-
-                    display: false
-
-                }
+                ]
 
             },
 
-            scales: {
 
-                y: {
+            options: {
 
-                    beginAtZero: true,
+                responsive: true,
 
-                    ticks: {
+                maintainAspectRatio: false,
 
-                        callback: function(value) {
 
-                            return '£' +
-                                value.toLocaleString();
+                plugins: {
 
-                        }
+                    legend: {
+
+                        display: false
 
                     }
 
                 },
 
-                x: {
 
-                    grid: {
+                scales: {
 
-                        display: false
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            callback: function(value) {
+
+                                return '£' +
+                                    Number(value).toLocaleString();
+
+                            }
+
+                        }
+
+                    },
+
+
+                    x: {
+
+                        grid: {
+
+                            display: false
+
+                        }
 
                     }
 
@@ -1369,11 +2100,12 @@ class="bg-transparent outline-none w-full text-sm">
 
             }
 
-        }
+        });
 
-    });
+    }
 
 </script>
 
 </body>
+
 </html>

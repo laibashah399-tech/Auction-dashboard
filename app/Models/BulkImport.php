@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
 
 class BulkImport extends Model
 {
+    use Auditable;
     protected $fillable = [
 
         'file_name',

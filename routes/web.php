@@ -13,6 +13,11 @@ use App\Http\Controllers\LiveBiddingController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\ShippingPickupController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\AuditLogController;
 
 
 
@@ -20,10 +25,9 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-Route::get('/dashboard', [
-    DashboardController::class,
-    'index'
-])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 Route::resource('auctions', AuctionController::class);
 
@@ -86,3 +90,71 @@ Route::get('/reports', [
     ReportController::class,
     'index'
 ])->name('reports.index');
+
+
+// Route::resource('users', UserController::class);
+
+
+Route::middleware('auth')->group(function () {
+
+Route::resource('users', UserController::class);
+
+
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+        ->name('notifications.read');
+
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.read-all');
+
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])
+        ->name('notifications.destroy');
+
+    Route::delete('/notifications', [NotificationController::class, 'destroyAll'])
+        ->name('notifications.destroy-all');
+
+        Route::get('/settings', [
+        SettingsController::class,
+        'index'
+    ])->name('settings.index');
+
+    Route::put('/settings', [
+        SettingsController::class,
+        'update'
+    ])->name('settings.update');
+
+       Route::get(
+        '/audit-logs',
+        [AuditLogController::class, 'index']
+    )->name('audit-logs.index');
+
+    Route::delete(
+        '/audit-logs/{auditLog}',
+        [AuditLogController::class, 'destroy']
+    )->name('audit-logs.destroy');
+
+    Route::delete(
+        '/audit-logs',
+        [AuditLogController::class, 'destroyAll']
+    )->name('audit-logs.destroy-all');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login');
+
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.submit');
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
+
+

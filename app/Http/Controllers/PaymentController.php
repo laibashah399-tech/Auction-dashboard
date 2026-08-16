@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Bidder;
 use App\Models\Lot;
+use App\Models\User;
+use App\Notifications\SystemNotification;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -95,7 +97,80 @@ class PaymentController extends Controller
         ]);
 
 
-        Payment::create($validated);
+        // Create payment
+        $payment = Payment::create($validated);
+
+
+        // ==========================================
+        // AUTOMATIC ADMIN NOTIFICATION
+        // ==========================================
+
+        $admins = User::where('role', 'Admin')->get();
+
+        // Get bidder and lot information
+        $bidder = Bidder::find($payment->bidder_id);
+        $lot = Lot::find($payment->lot_id);
+
+        // Notification title/message according to status
+        if ($payment->status === 'paid') {
+
+            $title = 'Payment Received';
+
+            $message = 'A payment of Rs. ' .
+                number_format($payment->amount, 2) .
+                ' has been received successfully.';
+
+            $type = 'payment';
+
+        } elseif ($payment->status === 'pending') {
+
+            $title = 'Payment Pending';
+
+            $message = 'A payment of Rs. ' .
+                number_format($payment->amount, 2) .
+                ' is currently pending.';
+
+            $type = 'warning';
+
+        } else {
+
+            $title = 'Payment Failed';
+
+            $message = 'A payment of Rs. ' .
+                number_format($payment->amount, 2) .
+                ' has failed.';
+
+            $type = 'error';
+        }
+
+
+        // Add bidder information if available
+        if ($bidder) {
+
+            $message .= ' Bidder: ' .
+                $bidder->name . '.';
+        }
+
+
+        // Add lot information if available
+        if ($lot) {
+
+            $message .= ' Lot #' .
+                $lot->id . '.';
+        }
+
+
+        // Send notification to all Admin users
+        foreach ($admins as $admin) {
+
+            $admin->notify(
+                new SystemNotification(
+                    $title,
+                    $message,
+                    $type
+                )
+            );
+        }
 
 
         return redirect()
@@ -163,7 +238,66 @@ class PaymentController extends Controller
         ]);
 
 
+        // Remember old status
+        $oldStatus = $payment->status;
+
+
+        // Update payment
         $payment->update($validated);
+
+
+        // ==========================================
+        // NOTIFICATION FOR PAYMENT UPDATE
+        // ==========================================
+
+        $admins = User::where('role', 'Admin')->get();
+
+        // Only notify if status changed
+        if ($oldStatus !== $payment->status) {
+
+            if ($payment->status === 'paid') {
+
+                $title = 'Payment Completed';
+
+                $message = 'Payment of Rs. ' .
+                    number_format($payment->amount, 2) .
+                    ' has been marked as paid.';
+
+                $type = 'payment';
+
+            } elseif ($payment->status === 'pending') {
+
+                $title = 'Payment Pending';
+
+                $message = 'Payment of Rs. ' .
+                    number_format($payment->amount, 2) .
+                    ' has been marked as pending.';
+
+                $type = 'warning';
+
+            } else {
+
+                $title = 'Payment Failed';
+
+                $message = 'Payment of Rs. ' .
+                    number_format($payment->amount, 2) .
+                    ' has been marked as failed.';
+
+                $type = 'error';
+            }
+
+
+            foreach ($admins as $admin) {
+
+                $admin->notify(
+                    new SystemNotification(
+                        $title,
+                        $message,
+                        $type
+                    )
+                );
+            }
+        }
 
 
         return redirect()

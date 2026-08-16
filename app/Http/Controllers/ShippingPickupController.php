@@ -7,6 +7,8 @@ use App\Models\Lot;
 use App\Models\Payment;
 use App\Models\Seller;
 use App\Models\ShippingPickup;
+use App\Models\User;
+use App\Notifications\SystemNotification;
 use Illuminate\Http\Request;
 
 class ShippingPickupController extends Controller
@@ -102,46 +104,13 @@ class ShippingPickupController extends Controller
      */
     public function create()
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Lots
-        |--------------------------------------------------------------------------
-        | IMPORTANT:
-        | Your previous code was using:
-        | Lot::where('status', 'sold')
-        |
-        | So if your database has no sold lots,
-        | the dropdown will be empty.
-        |
-        | For now we load all lots so you can see your
-        | existing lot records.
-        */
-
         $lots = Lot::orderBy('lot_number')->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Bidders
-        |--------------------------------------------------------------------------
-        */
-
         $bidders = Bidder::orderBy('name')->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Sellers
-        |--------------------------------------------------------------------------
-        */
 
         $sellers = Seller::where('status', 'active')
             ->orderBy('name')
             ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Payments
-        |--------------------------------------------------------------------------
-        */
 
         $payments = Payment::orderByDesc('id')->get();
 
@@ -161,7 +130,6 @@ class ShippingPickupController extends Controller
     {
         $validated = $request->validate([
 
-            // Order information
             'lot_id' => [
                 'required',
                 'exists:lots,id'
@@ -182,42 +150,33 @@ class ShippingPickupController extends Controller
                 'exists:payments,id'
             ],
 
-            // Delivery type
-            // IMPORTANT:
-            // Blade uses "type", not "method".
             'type' => [
                 'required',
                 'in:shipping,pickup'
             ],
 
-            // Status
             'status' => [
                 'required',
                 'in:pending,processing,shipped,ready_for_pickup,delivered'
             ],
 
-            // Tracking
             'tracking_number' => [
                 'nullable',
                 'string',
                 'max:255'
             ],
 
-            // Shipping cost
             'shipping_cost' => [
                 'nullable',
                 'numeric',
                 'min:0'
             ],
 
-            // Address
-            // Blade uses "address".
             'address' => [
                 'nullable',
                 'string'
             ],
 
-            // Notes
             'notes' => [
                 'nullable',
                 'string'
@@ -227,12 +186,8 @@ class ShippingPickupController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Convert form field "type" to database field "method"
+        | Convert type -> method
         |--------------------------------------------------------------------------
-        |
-        | Your controller/database appears to use "method",
-        | while your Blade form uses "type".
-        |
         */
 
         $validated['method'] = $validated['type'];
@@ -242,12 +197,8 @@ class ShippingPickupController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Convert address field
+        | Convert address -> shipping_address
         |--------------------------------------------------------------------------
-        |
-        | If your database column is shipping_address,
-        | store the Blade "address" value there.
-        |
         */
 
         $validated['shipping_address'] = $validated['address'] ?? null;
@@ -261,7 +212,43 @@ class ShippingPickupController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        ShippingPickup::create($validated);
+        $shippingPickup = ShippingPickup::create($validated);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Automatic Notification
+        |--------------------------------------------------------------------------
+        */
+
+        $lot = Lot::find($shippingPickup->lot_id);
+
+        $methodText = $shippingPickup->method === 'shipping'
+            ? 'Shipping'
+            : 'Pickup';
+
+        $statusText = ucwords(
+            str_replace('_', ' ', $shippingPickup->status)
+        );
+
+        User::all()->each(function ($user) use (
+            $lot,
+            $methodText,
+            $statusText,
+            $shippingPickup
+        ) {
+
+            $user->notify(new SystemNotification(
+                'Shipping / Pickup Created',
+                $methodText .
+                ' record created for lot "' .
+                ($lot->title ?? 'Unknown Lot') .
+                '". Status: ' .
+                $statusText .
+                '.',
+                'shipping'
+            ));
+        });
 
 
         return redirect()
@@ -329,7 +316,6 @@ class ShippingPickupController extends Controller
     ) {
         $validated = $request->validate([
 
-            // Order information
             'lot_id' => [
                 'required',
                 'exists:lots,id'
@@ -350,39 +336,33 @@ class ShippingPickupController extends Controller
                 'exists:payments,id'
             ],
 
-            // Delivery type
             'type' => [
                 'required',
                 'in:shipping,pickup'
             ],
 
-            // Status
             'status' => [
                 'required',
                 'in:pending,processing,shipped,ready_for_pickup,delivered'
             ],
 
-            // Tracking
             'tracking_number' => [
                 'nullable',
                 'string',
                 'max:255'
             ],
 
-            // Shipping cost
             'shipping_cost' => [
                 'nullable',
                 'numeric',
                 'min:0'
             ],
 
-            // Address
             'address' => [
                 'nullable',
                 'string'
             ],
 
-            // Notes
             'notes' => [
                 'nullable',
                 'string'
@@ -414,11 +394,55 @@ class ShippingPickupController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Update record
+        | Detect status change
         |--------------------------------------------------------------------------
         */
 
+        $oldStatus = $shippingPickup->status;
+
         $shippingPickup->update($validated);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Automatic Notification
+        |--------------------------------------------------------------------------
+        */
+
+        $lot = Lot::find($shippingPickup->lot_id);
+
+        $methodText = $shippingPickup->method === 'shipping'
+            ? 'Shipping'
+            : 'Pickup';
+
+        $newStatus = $shippingPickup->status;
+
+        $statusText = ucwords(
+            str_replace('_', ' ', $newStatus)
+        );
+
+
+        // Only send notification when status actually changes
+        if ($oldStatus !== $newStatus) {
+
+            User::all()->each(function ($user) use (
+                $lot,
+                $methodText,
+                $statusText
+            ) {
+
+                $user->notify(new SystemNotification(
+                    'Shipping Status Updated',
+                    $methodText .
+                    ' status for lot "' .
+                    ($lot->title ?? 'Unknown Lot') .
+                    '" changed to ' .
+                    $statusText .
+                    '.',
+                    'shipping'
+                ));
+            });
+        }
 
 
         return redirect()
@@ -436,6 +460,23 @@ class ShippingPickupController extends Controller
     public function destroy(ShippingPickup $shippingPickup)
     {
         $shippingPickup->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Automatic Notification
+        |--------------------------------------------------------------------------
+        */
+
+        User::all()->each(function ($user) {
+
+            $user->notify(new SystemNotification(
+                'Shipping / Pickup Deleted',
+                'A shipping or pickup record has been deleted.',
+                'shipping'
+            ));
+        });
+
 
         return redirect()
             ->route('shipping-pickups.index')
