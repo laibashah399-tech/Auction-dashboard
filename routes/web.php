@@ -18,8 +18,14 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\GlobalSearchController;
 
 
+/*
+|--------------------------------------------------------------------------
+| MAIN / DASHBOARD
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -29,9 +35,30 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
 
+
+/*
+|--------------------------------------------------------------------------
+| AUCTIONS
+|--------------------------------------------------------------------------
+*/
+
 Route::resource('auctions', AuctionController::class);
 
+
+/*
+|--------------------------------------------------------------------------
+| LOTS
+|--------------------------------------------------------------------------
+*/
+
 Route::resource('lots', LotController::class);
+
+
+/*
+|--------------------------------------------------------------------------
+| BULK IMPORTS
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/bulk-imports', [
     BulkImportController::class,
@@ -52,14 +79,30 @@ Route::post('/bulk-imports', [
 //     BulkImportController::class,
 //     'destroy'
 // ])->name('bulk-imports.destroy');
+
 Route::delete('/bulk-imports/{bulkImport}', [
     BulkImportController::class,
     'destroy'
 ])->name('bulk-imports.destroy');
+
+
+/*
+|--------------------------------------------------------------------------
+| BIDDERS
+|--------------------------------------------------------------------------
+*/
+
 Route::resource('bidders', BidderController::class)
     ->except(['show']);
 
-    Route::resource(
+
+/*
+|--------------------------------------------------------------------------
+| PAYMENTS
+|--------------------------------------------------------------------------
+*/
+
+Route::resource(
     'payments',
     PaymentController::class
 )->except([
@@ -67,24 +110,65 @@ Route::resource('bidders', BidderController::class)
 ]);
 
 
-Route::delete('/auction-images/{image}', [AuctionImageController::class, 'destroy'])
-    ->name('auction-images.destroy');
+/*
+|--------------------------------------------------------------------------
+| AUCTION IMAGES
+|--------------------------------------------------------------------------
+*/
+
+Route::delete('/auction-images/{image}', [
+    AuctionImageController::class,
+    'destroy'
+])->name('auction-images.destroy');
 
 
-    Route::post('/lots/{lot}/bid',[BidController::class,'store'])
-    ->name('bids.store');
+/*
+|--------------------------------------------------------------------------
+| BIDS
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/lots/{lot}/bid', [
+    BidController::class,
+    'store'
+])->name('bids.store');
 
 
-  Route::get('/live-bidding', [LiveBiddingController::class, 'index'])
-    ->name('live-bidding.index');
+/*
+|--------------------------------------------------------------------------
+| LIVE BIDDING
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/live-bidding', [
+    LiveBiddingController::class,
+    'index'
+])->name('live-bidding.index');
 
 
-    Route::resource('sellers', SellerController::class);
+/*
+|--------------------------------------------------------------------------
+| SELLERS
+|--------------------------------------------------------------------------
+*/
 
-    
+Route::resource('sellers', SellerController::class);
+
+
+/*
+|--------------------------------------------------------------------------
+| SHIPPING & PICKUP
+|--------------------------------------------------------------------------
+*/
 
 Route::resource('shipping-pickups', ShippingPickupController::class);
 
+
+/*
+|--------------------------------------------------------------------------
+| REPORTS
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/reports', [
     ReportController::class,
@@ -92,30 +176,76 @@ Route::get('/reports', [
 ])->name('reports.index');
 
 
-// Route::resource('users', UserController::class);
+/*
+|--------------------------------------------------------------------------
+| GLOBAL SEARCH
+|--------------------------------------------------------------------------
+*/
 
+Route::middleware('auth')->get(
+    '/global-search',
+    [GlobalSearchController::class, 'search']
+)->name('global-search');
+
+
+/*
+|--------------------------------------------------------------------------
+| USERS & SYSTEM MANAGEMENT
+|--------------------------------------------------------------------------
+*/
+
+// Route::resource('users', UserController::class);
 
 Route::middleware('auth')->group(function () {
 
-Route::resource('users', UserController::class);
+    /*
+    |--------------------------------------------------------------------------
+    | USERS & ROLES
+    |--------------------------------------------------------------------------
+    */
+
+    Route::resource('users', UserController::class);
 
 
-    Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
+    /*
+    |--------------------------------------------------------------------------
+    | NOTIFICATIONS
+    |--------------------------------------------------------------------------
+    */
 
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
-        ->name('notifications.read');
+    Route::get('/notifications', [
+        NotificationController::class,
+        'index'
+    ])->name('notifications.index');
 
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
-        ->name('notifications.read-all');
+    Route::post('/notifications/{id}/read', [
+        NotificationController::class,
+        'markAsRead'
+    ])->name('notifications.read');
 
-    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])
-        ->name('notifications.destroy');
+    Route::post('/notifications/read-all', [
+        NotificationController::class,
+        'markAllAsRead'
+    ])->name('notifications.read-all');
 
-    Route::delete('/notifications', [NotificationController::class, 'destroyAll'])
-        ->name('notifications.destroy-all');
+    Route::delete('/notifications/{id}', [
+        NotificationController::class,
+        'destroy'
+    ])->name('notifications.destroy');
 
-        Route::get('/settings', [
+    Route::delete('/notifications', [
+        NotificationController::class,
+        'destroyAll'
+    ])->name('notifications.destroy-all');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SETTINGS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/settings', [
         SettingsController::class,
         'index'
     ])->name('settings.index');
@@ -125,7 +255,14 @@ Route::resource('users', UserController::class);
         'update'
     ])->name('settings.update');
 
-       Route::get(
+
+    /*
+    |--------------------------------------------------------------------------
+    | AUDIT LOGS
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
         '/audit-logs',
         [AuditLogController::class, 'index']
     )->name('audit-logs.index');
@@ -144,17 +281,21 @@ Route::resource('users', UserController::class);
 
 /*
 |--------------------------------------------------------------------------
-| Authentication
+| AUTHENTICATION
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', [AuthController::class, 'showLogin'])
-    ->name('login');
+Route::get('/login', [
+    AuthController::class,
+    'showLogin'
+])->name('login');
 
-Route::post('/login', [AuthController::class, 'login'])
-    ->name('login.submit');
+Route::post('/login', [
+    AuthController::class,
+    'login'
+])->name('login.submit');
 
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
-
-
+Route::post('/logout', [
+    AuthController::class,
+    'logout'
+])->name('logout');

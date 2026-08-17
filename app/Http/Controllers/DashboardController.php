@@ -8,6 +8,9 @@ use App\Models\Bidder;
 use App\Models\Lot;
 use App\Models\Payment;
 use App\Models\BulkImport;
+use App\Models\Seller;
+use App\Models\ShippingPickup;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -21,7 +24,7 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $search = $request->input('search');
+        $search = trim($request->input('search', ''));
 
         /*
         |--------------------------------------------------------------------------
@@ -92,18 +95,314 @@ class DashboardController extends Controller
             ])
             ->latest();
 
+
         /*
         |--------------------------------------------------------------------------
-        | DASHBOARD SEARCH
+        | DASHBOARD GLOBAL SEARCH
         |--------------------------------------------------------------------------
+        |
+        | Search is now performed across:
+        | Auctions
+        | Lots
+        | Bidders
+        | Sellers
+        | Payments
+        | Bulk Imports
+        | Shipping & Pickup
+        | Users
+        |
         */
 
-        if ($search) {
-            $liveAuctionsQuery->where(function ($query) use ($search) {
+        $searchResults = collect();
+
+        if ($search !== '') {
+
+            /*
+            |----------------------------------------------------------------------
+            | Auctions
+            |----------------------------------------------------------------------
+            */
+
+            $auctionResults = Auction::where(function ($query) use ($search) {
+
                 $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('id', $search);
-            });
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'Auction',
+                        'title' => $item->name,
+                        'description' => $item->status ?? 'Auction',
+                        'url' => route('auctions.show', $item->id),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($auctionResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Lots
+            |----------------------------------------------------------------------
+            */
+
+            $lotResults = Lot::where(function ($query) use ($search) {
+
+                $query->where('lot_number', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'Lot',
+                        'title' => 'Lot #' . $item->lot_number . ' - ' . $item->title,
+                        'description' => $item->status ?? 'Lot',
+                        'url' => route('lots.show', $item->id),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($lotResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Bidders
+            |----------------------------------------------------------------------
+            */
+
+            $bidderResults = Bidder::where(function ($query) use ($search) {
+
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'Bidder',
+                        'title' => $item->name,
+                        'description' => $item->email ?? 'Bidder',
+                        'url' => route('bidders.index'),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($bidderResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Sellers
+            |----------------------------------------------------------------------
+            */
+
+            $sellerResults = Seller::where(function ($query) use ($search) {
+
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'Seller',
+                        'title' => $item->name,
+                        'description' => $item->email ?? 'Seller',
+                        'url' => route('sellers.index'),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($sellerResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Payments
+            |----------------------------------------------------------------------
+            */
+
+            $paymentResults = Payment::where(function ($query) use ($search) {
+
+                $query->where('status', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search)
+                        ->orWhere('amount', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'Payment',
+                        'title' => 'Payment #' . $item->id,
+                        'description' => '£' . number_format($item->amount ?? 0, 2)
+                            . ' - ' . ($item->status ?? ''),
+                        'url' => route('payments.index'),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($paymentResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Bulk Imports
+            |----------------------------------------------------------------------
+            */
+
+            $bulkImportResults = BulkImport::where(function ($query) use ($search) {
+
+                $query->where('status', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'Bulk Import',
+                        'title' => 'Bulk Import #' . $item->id,
+                        'description' => $item->status ?? 'Bulk Import',
+                        'url' => route('bulk-imports.index'),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($bulkImportResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Shipping & Pickup
+            |----------------------------------------------------------------------
+            */
+
+            $shippingResults = ShippingPickup::where(function ($query) use ($search) {
+
+                $query->where('status', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'Shipping & Pickup',
+                        'title' => 'Shipping #' . $item->id,
+                        'description' => $item->status ?? 'Shipping & Pickup',
+                        'url' => route('shipping-pickups.index'),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($shippingResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Users
+            |----------------------------------------------------------------------
+            */
+
+            $userResults = User::where(function ($query) use ($search) {
+
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', $search);
+                }
+
+            })
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(function ($item) {
+
+                    return [
+                        'type' => 'User',
+                        'title' => $item->name,
+                        'description' => $item->email ?? 'User',
+                        'url' => route('users.index'),
+                    ];
+
+                });
+
+            $searchResults = $searchResults->merge($userResults);
+
+
+            /*
+            |----------------------------------------------------------------------
+            | Limit Results
+            |----------------------------------------------------------------------
+            */
+
+            $searchResults = $searchResults->take(50);
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LIVE AUCTIONS
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        | Global search does NOT modify the normal Live Auctions section.
+        | So your existing dashboard functionality remains unchanged.
+        |
+        */
 
         $liveAuctions = $liveAuctionsQuery->get();
 
@@ -218,6 +517,7 @@ class DashboardController extends Controller
         return view('dashboard', compact(
 
             'search',
+            'searchResults',
 
             'totalAuctions',
             'totalLots',

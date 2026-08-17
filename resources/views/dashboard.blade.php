@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<style>
+    /* Sidebar Scrollbar */
+    #sidebar nav::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #sidebar nav::-webkit-scrollbar-track {
+        background: #020617;
+    }
+
+    #sidebar nav::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+    }
+
+    #sidebar nav::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+    }
+</style>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -399,20 +419,20 @@
                         class="w-5 h-5 text-gray-400 mr-2">
                     </i>
 
-                    <form
-                        action="{{ route('dashboard') }}"
-                        method="GET"
-                        class="w-full">
+                  <form 
+    action="{{ route('dashboard') }}" 
+    method="GET" 
+    class="w-full">
 
-                        <input
-                            type="text"
-                            name="search"
-                            value="{{ request('search') }}"
-                            placeholder="Search auctions..."
-                            class="bg-transparent outline-none w-full text-sm">
+    <input 
+        type="text"
+        name="search"
+        value="{{ request('search') }}"
+        placeholder="Search auctions, lots, bidders, sellers..."
+        class="bg-transparent outline-none w-full text-sm"
+        autocomplete="off">
 
-                    </form>
-
+</form>
                 </div>
 
             </div>
@@ -496,6 +516,167 @@
         <!-- ================================================= -->
 
         <main class="p-4 sm:p-6 lg:p-8">
+            {{-- ========================================================= --}}
+{{-- SEARCH RESULTS --}}
+{{-- ========================================================= --}}
+
+@if(request('search'))
+
+    <div class="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm">
+
+        {{-- Search Header --}}
+        <div class="p-6 border-b border-gray-100">
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <h3 class="text-lg font-bold text-gray-900">
+                        Search Results
+                    </h3>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Results for:
+                        <span class="font-semibold text-gray-700">
+                            "{{ request('search') }}"
+                        </span>
+                    </p>
+
+                </div>
+
+                {{-- Clear Search --}}
+                <a
+                    href="{{ route('dashboard') }}"
+                    class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+
+                    Clear Search
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        {{-- Results --}}
+        @if($searchResults->count() > 0)
+
+            <div class="divide-y divide-gray-100">
+
+                @foreach($searchResults as $result)
+
+                    <a
+                        href="{{ $result['url'] }}"
+                        class="flex items-center justify-between p-5 hover:bg-gray-50 transition">
+
+                        {{-- Left Side --}}
+                        <div class="flex items-center gap-4">
+
+                            {{-- Icon --}}
+                            <div
+                                class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+
+                                @if($result['type'] === 'Auction')
+
+                                    <i data-lucide="gavel" class="w-5 h-5"></i>
+
+                                @elseif($result['type'] === 'Lot')
+
+                                    <i data-lucide="package" class="w-5 h-5"></i>
+
+                                @elseif($result['type'] === 'Bidder')
+
+                                    <i data-lucide="users" class="w-5 h-5"></i>
+
+                                @elseif($result['type'] === 'Seller')
+
+                                    <i data-lucide="user-round" class="w-5 h-5"></i>
+
+                                @elseif($result['type'] === 'Payment')
+
+                                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+
+                                @elseif($result['type'] === 'Bulk Import')
+
+                                    <i data-lucide="upload" class="w-5 h-5"></i>
+
+                                @elseif($result['type'] === 'Shipping & Pickup')
+
+                                    <i data-lucide="truck" class="w-5 h-5"></i>
+
+                                @else
+
+                                    <i data-lucide="user" class="w-5 h-5"></i>
+
+                                @endif
+
+                            </div>
+
+
+                            {{-- Result Information --}}
+                            <div>
+
+                                <p class="font-semibold text-gray-900">
+                                    {{ $result['title'] }}
+                                </p>
+
+                                <p class="text-sm text-gray-500">
+                                    {{ $result['description'] }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- Right Side --}}
+                        <div class="flex items-center gap-3">
+
+                            <span
+                                class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-600">
+
+                                {{ $result['type'] }}
+
+                            </span>
+
+                            <i
+                                data-lucide="chevron-right"
+                                class="w-5 h-5 text-gray-400">
+                            </i>
+
+                        </div>
+
+                    </a>
+
+                @endforeach
+
+            </div>
+
+        @else
+
+            {{-- No Results --}}
+            <div class="p-10 text-center">
+
+                <i
+                    data-lucide="search-x"
+                    class="w-10 h-10 mx-auto text-gray-300">
+                </i>
+
+                <p class="text-gray-600 font-medium mt-3">
+                    No results found
+                </p>
+
+                <p class="text-sm text-gray-400 mt-1">
+                    Try another search term.
+                </p>
+
+            </div>
+
+        @endif
+
+    </div>
+
+@endif
 
 
             <!-- ================================================= -->
